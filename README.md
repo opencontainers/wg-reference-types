@@ -2,7 +2,7 @@
 
 ## Mission Statement
 
-TBD
+Propose how to describe and query relationships between objects stored in an OCI registry.
 
 ## Proposal
 
