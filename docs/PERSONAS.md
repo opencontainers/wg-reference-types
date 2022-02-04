@@ -17,7 +17,7 @@ From the list of below, we are primarily designing to improve
 the function of
 **(3) The Refrigerated Truck Driver**.
 
-This working group is equivalent to the corporate strategy
+This working group is equivalent to the strategy
 team within the logitisics arm of *Glen and Larry's*.
 
 How do we improve our capabilities and efficiency as ice cream
