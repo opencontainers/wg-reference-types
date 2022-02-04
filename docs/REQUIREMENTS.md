@@ -77,3 +77,5 @@ these apply to Artifacts too*
 - As a tool writer, I would like to perform a server side blob mount when copying a large artifact between repositories
 - As a user, I would like to walk the CAS tree in reverse. This would allow a query of all manifests pointing to a blob digest, and all manifest lists pointing to a manifest digest
 - As a registry operator, I want attempts to push artifacts to an older registry to have a minimal impact (e.g. artifacts are not missed by GC causing bloating of storage, and a tagged artifact does not break tag listings)
+- As a user, I would like graceful degradation if the registry does not support the new ref types. This would either be some kind of limited fall back support or a clear error message from tooling
+- As a user, I want to be sure existing runtimes are not affected by any of the new reference types added to images
