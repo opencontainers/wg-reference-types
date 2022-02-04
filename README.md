@@ -12,6 +12,14 @@ Link to [proposal](https://github.com/opencontainers/tob/blob/main/proposals/wg-
 * WG Meeting: [Tuesdays at 11:00am PT (Pacific Time)](https://zoom.us/j/92128676364) (weekly). [Convert to your timezone](https://dateful.com/convert/pt-pacific-time?t=11am).
   * [Meeting notes and Agenda](https://docs.google.com/document/d/1SVOWQTowigXzbYdorzfa7tMmrcm91yK12LvSONqziJY/edit).
 
+## In Progress
+
+The following documents are actively being updated by the WG:
+
+| Document                       | Description                                                         |
+| ------------------------------ | ------------------------------------------------------------------- |
+| [Changes](./docs/CHANGES.md)   | A list of changes that may be required in OCI to enable our efforts |
+
 ## Organizers
 
 * Lachlan Evenson (@lachie83)
