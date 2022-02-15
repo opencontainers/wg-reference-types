@@ -8,6 +8,10 @@ Propose how to describe and query relationships between objects stored in an OCI
 
 Link to [proposal](https://github.com/opencontainers/tob/blob/main/proposals/wg-reference-types.md).
 
+## Governance
+
+Link to [governance](./GOVERNANCE) document.
+
 ## Meetings
 
 * WG Meeting: [Tuesdays at 11:00am PT (Pacific Time)](https://zoom.us/j/92128676364) (weekly). [Convert to your timezone](https://dateful.com/convert/pt-pacific-time?t=11am).
