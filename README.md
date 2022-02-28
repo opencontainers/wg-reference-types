@@ -17,10 +17,11 @@ Link to [proposal](https://github.com/opencontainers/tob/blob/main/proposals/wg-
 
 The following documents are actively being updated by the WG:
 
-| Document                         | Description                                                      |
-| -------------------------------- | ---------------------------------------------------------------- |
-| [Personas](./docs/PERSONAS.md)   | A friendly frame of reference to characterize our design goals   |
-| [Upgrading](./docs/UPGRADING.md) | A description of upgrade scenarios at various stages of adoption |
+| Document                               | Description                                                      |
+| -------------------------------------- | ---------------------------------------------------------------- |
+| [Personas](./docs/PERSONAS.md)         | A friendly frame of reference to characterize our design goals   |
+| [Requirements](./docs/REQUIREMENTS.md) | A list of requirements identified by the WG                      |
+| [Upgrading](./docs/UPGRADING.md)       | A description of upgrade scenarios at various stages of adoption |
 
 ## Organizers
 
