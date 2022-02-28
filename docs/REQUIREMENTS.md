@@ -7,9 +7,44 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Member-submitted user stories (Distilled)
 
-TODO: This section reserved for a more compact, distilled
-version of the list of member-submitted user stories
-found below (with duplicates removed, summarization, etc.)
+### Top level definitions
+- An OCI artifact is defined as any artifact that is to be stored in an OCI registry.
+- A container image is a specialized OCI artifact as defined by the OCI [image](https://github.com/opencontainers/image-spec) and [runtime](https://github.com/opencontainers/runtime-spec) specifications.
+
+### User stories
+
+The following are categorized user stories 
+
+#### Filtering
+- As a user, I want to query a registry for stored artifacts by digest and tag.
+- As a user, I want to query the registry for all stored artifacts that reference another artifact by its tag and digest.
+- As a user, I want to query a registry for all stored artifacts of a particular type that reference another artifact by its tag and digest.
+- As a user, I want to query a registry for all stored artifacts based on annotations that reference another artifact by its tag and digest.
+- As a user, I want to fetch the most up-to-date artifact, collection of artifacts, or application.
+- As an artifact producer, I would like to reduce the number of tags that reference artifacts.
+
+#### Backwards Compatibility
+- As a user, I want to be sure that existing container runtimes are not affected by any other type of registry artifact.
+- As a user, I want to move container images to and from registries that do not support reference types. 
+- As an artifact producer, I want to tag artifacts that I can pull by said tag, even if they contain references to other artifacts.
+- As an artifact producer, I want be sure that pushing an artifact to a repository will not affect a copy of the same artifact previously created and referenced by a manifest list existing in another repository on the same registry.
+- As a tool writer, I want to identify whether a registry supports reference types or not.
+- As a tool writer, I would like the option to perform a server side blob mount when copying a large artifact between repositories.
+
+#### Content Management
+- As a user, I want to store one or more artifacts in a registry with a reference to another related artifact.
+- As a user, when I delete an artifact, I want the option to delete one or more artifacts referencing it.
+- As a user, I want to push an artifact that references another artifact that doesn't exist on the registry yet.
+- As a user, I want to move an artifact and one or more artifacts referencing it from one registry to another.
+- As a registry operator, I want to help users understand how they can manage the lifecycle of their artifacts.
+- As a registry operator, I want to allow users to "lock" the tags to their artifacts.
+- As an artifact producer, I want to update an existing artifact with a newer artifact.
+- As an artifact producer, I want to push multiple artifacts concurrently (possibly from separate systems) without encountering race conditions or other errors.
+- As an artifact author, I want to document other artifacts in one or more registres that my artifact requires and/or provides.
+- As a user, I want assurances that the object I found really did come from the claimed supplier.
+- As an artifact author, I want to add assurances that the artifact originated from me.
+- As a registry operator, I want to provide users with retention policies for their artifacts.
+- As a user, I want to apply timestamp or numerical ranges on my artifacts so I can apply retention policies on them. 
 
 ## Member-submitted user stories (Raw)
 
