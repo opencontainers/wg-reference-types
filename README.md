@@ -44,6 +44,7 @@ The following documents are actively being updated by the WG:
 | [Requirements](./docs/REQUIREMENTS.md)  | A list of requirements identified by the WG                      |
 | [Upgrading](./docs/UPGRADING.md)        | A description of upgrade scenarios at various stages of adoption |
 | [Proposal Template](./docs/TEMPLATE.md) | A template for submitting a new reference types proposal         |
+| [Evaluation Rubric](./docs/RUBRIC.md) | A comparison matrix of proposals to use cases         |
 
 ## Organizers
 
