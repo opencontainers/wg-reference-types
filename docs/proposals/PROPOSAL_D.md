@@ -129,7 +129,7 @@ The following assumes the original index digest was `sha256:000000...` before th
    - Pushing directly to the target `<tag>` is useful when artifacts are added by the image originator.
    - Altering an existing tag will change the digest, and should be avoided on copies of the referenced artifact.
 1. `<repo>:sha256-000000....<type>`:
-   - Type indicates the type of artifact (sig, sbom, etc). 
+   - Type indicates the type of artifact (sig, sbom, etc).
    - This may point directly to the artifact instead of the index.
    - Updating this tag with additional artifacts requires the use of an index and has potential race conditions.
 1. `<repo>:sha256-000000....<hash>.<type>`:
