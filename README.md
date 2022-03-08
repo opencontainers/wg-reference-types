@@ -29,7 +29,7 @@ The following proposals are currently being evaluated by the WG:
 | A  | [View](./proposals/PROPOSAL_A.md) | *Reserved for Steve*   |
 | B  | [View](./proposals/PROPOSAL_B.md) | *Reserved for Dan*     |
 | C  | [View](./proposals/PROPOSAL_C.md) | *Reserved for Nisha*   |
-| D  | [View](./proposals/PROPOSAL_D.md) | *Reserved for Brandon* |
+| D  | [View](./proposals/PROPOSAL_D.md) | No Changes             |
 
 *Want to add a new proposal? Submit a PR following the format of the
 [template](./docs/TEMPLATE.md).*
@@ -55,5 +55,6 @@ The following documents are actively being updated by the WG:
 * Jon Johnson (@jonjohnsonjr)
 
 ## Contact
-- Slack: [#wg-reference-types](https://opencontainers.slack.com/messages/wg-api-expression)
-- [GitHub Discussions](https://github.com/opencontainers/wg-reference-types/discussions)
+
+* Slack: [#wg-reference-types](https://opencontainers.slack.com/messages/wg-api-expression)
+* [GitHub Discussions](https://github.com/opencontainers/wg-reference-types/discussions)
