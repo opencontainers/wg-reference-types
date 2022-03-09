@@ -38,11 +38,17 @@ The artifact is defined using the existing OCI Artifact definition (image-spec t
         "com.example.metadata": "value"
       }
     }
-  ]
+  ],
+  "annotations": {
+    // "org.opencontainers.reference" is not included here since one artifact could reference multiple objects
+    "org.opencontainers.reference.type": "sig"
+    // additional annotations may be added for filtering queries (to avoid fetching blobs)
+  }
 }
 ```
 
 Attaching an artifact to another object in the registry may be done with an OCI Index.
+This should only be done by the image originator since changes to this index would modify the digest.
 For this example, the above artifact manifest is assumed to be `sha256:a0a0a0...`:
 
 ```jsonc
@@ -59,19 +65,6 @@ For this example, the above artifact manifest is assumed to be `sha256:a0a0a0...
         "os": "linux"
       }
     },
-    { // the following is an artifact for the above linux/amd64 image
-      "mediaType": "application/vnd.oci.image.manifest.v1+json",
-      "digest": "sha256:a0a0a0...",
-      "size": 1234,
-      "platform": {
-        "architecture": "amd64",
-        "os": "linux"
-      },
-      "annotations": {
-        "vnd.oci.artifact": "true", // this descriptor points to an artifact
-        "vnd.oci.artifact.type": "sig" // additional annotations may be used for filtering queries
-      }
-    },
     {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:020202...",
@@ -81,36 +74,37 @@ For this example, the above artifact manifest is assumed to be `sha256:a0a0a0...
         "os": "linux"
       }
     },
-    { // the following is an artifact for the above linux/arm64 image
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:a0a0a0...",
+      "size": 1234,
+      "platform": {
+        "os": "unknown" // platform that shouldn't be used by image runtimes
+      },
+      "annotations": {
+        "org.opencontainers.reference": "sha256:010101...", // this is a reference to another descriptor
+        "org.opencontainers.reference.type": "sig" // type is recommended for client filtering
+        // additional annotations may be added for filtering queries
+      }
+    },
+    {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:b0b0b0...",
       "size": 1234,
       "platform": {
-        "architecture": "arm64",
-        "os": "linux"
+        "os": "unknown"
       },
+      "data": "<base64-encoded-artifact>", // artifact data may be inlined
       "annotations": {
-        "vnd.oci.artifact": "true",
-        "vnd.oci.artifact.type": "sbom"
-      }
-    },
-    { // the following is an image with the artifact directly embedded as base64
-      "mediaType": "application/vnd.oci.image.manifest.v1+json",
-      "digest": "sha256:c0c0c0...",
-      "size": 1152,
-      "platform": {
-        "architecture": "arm",
-        "os": "linux",
-        "variant": "v7"
-      },
-      "annotations": {
-        // there is no `vnd.oci.artifact` annotation since this is an image descriptor
-        "vnd.oci.artifact.sig.data": "<base64-encoded-artifact>" // embedding small artifacts
+        "org.opencontainers.reference": "sha256:020202...",
+        "org.opencontainers.reference.type": "sbom"
       }
     }
   ]
 }
 ```
+
+Later examples assume the digest of the index above is `sha256:000000...`.
 
 Runtimes select the first matching manifest when they do not understand the artifact annotations.
 This is specified in the [OCI image-spec index definition][image-spec-index]:
@@ -122,19 +116,21 @@ This is specified in the [OCI image-spec index definition][image-spec-index]:
 The distribution-spec is unmodified.
 Querying for a reference involves pulling either existing tags pointing to an index that includes the artifact and image, or pulling new tags that use the digest of the referenced image in the tag value.
 
-The index with the embedded artifact references may be pushed to one of three tags.
-The following assumes the original index digest was `sha256:000000...` before the artifacts were added:
+References may be pushed to the following tags.
 
 1. `<repo>:<tag>`:
    - Pushing directly to the target `<tag>` is useful when artifacts are added by the image originator.
-   - Altering an existing tag will change the digest, and should be avoided on copies of the referenced artifact.
-1. `<repo>:sha256-000000....<type>`:
-   - Type indicates the type of artifact (sig, sbom, etc).
-   - This may point directly to the artifact instead of the index.
-   - Updating this tag with additional artifacts requires the use of an index and has potential race conditions.
-1. `<repo>:sha256-000000....<hash>.<type>`:
+   - Altering an existing index after it is released is not recommended since it will change the digest.
+1. `<repo>:<alg>-<ref>.<hash>.<type>`:
+   - E.g. `registry.example.org/project-d:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
+   - `<alg>`: the digest algorithm
+   - `<ref>`: the referenced digest (limit of 64 characters)
+   - `<hash>`: hash of this artifact (limit of 16 characters)
+   - `<type>`: type of artifact for filtering
    - Adding a short hash of the artifact allows multiple artifacts of the same type with little risk of collision or race conditions.
-   - This may point directly to the artifact instead of the index.
-   - This increases query complexity since a tag listing must be retrieved and parsed.
+   - This may point directly to an artifact instead of the index.
+   - Image originators should include these tags for every referenced image inside their index, pointing to the same digest as the original index.
+     E.g. `sha256-010101...a0a0a0.sig` and `sha256-020202...b0b0b0.sbom` would be created and both point to `sha256:000000...`.
+   - Periodic garbage collection may be performed by clients pushing new references, deleting stale references that have been replaced with newer versions, and tags that no longer point to an accessible manifest.
 
 [image-spec-index]: https://github.com/opencontainers/image-spec/blob/main/image-index.md
