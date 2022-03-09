@@ -7,33 +7,40 @@ This Rubric is based on the [user stories](https://github.com/opencontainers/wg-
 The Rubric will be updated based on consensus reached in the community meetings.
 
 Key:
+
 - F: Filtering
 - B: Backwards Compatibility
 - C: Content Management
 
 |User Stories|Proposal A|Proposal B|Proposal C|Proposal D|
 |--- |--- |--- |--- |--- |
-|**F.1**| | | | |
-|**F.2**| | | | |
-|**F.3**| | | | |
-|**F.5**| | | | |
-|**F.6**| | | | |
-|**B.1**| | | | |
-|**B.2**| | | | |
-|**B.3**| | | | |
-|**B.4**| | | | |
-|**B.5**| | | | |
-|**B.6**| | | | |
-|**C.1**| | | | |
-|**C.2**| | | | |
-|**C.3**| | | | |
-|**C.4**| | | | |
-|**C.5**| | | | |
-|**C.6**| | | | |
-|**C.7**| | | | |
-|**C.8**| | | | |
-|**C.9**| | | | |
-|**C.10**| | | | |
-|**C.11**| | | | |
-|**C.12**| | | | |
-|**C.13**| | | | |
+|**F.1**| | | | Yes |
+|**F.2**| | | | Yes |
+|**F.3**| | | | Yes |
+|**F.4**| | | | Partial (1) |
+|**F.5**| | | | Partial (1) |
+|**F.6**| | | | No |
+|**B.1**| | | | Yes (Testing needed) |
+|**B.2**| | | | Yes |
+|**B.3**| | | | Yes |
+|**B.4**| | | | Yes |
+|**B.5**| | | | N/A |
+|**B.6**| | | | Yes |
+|**C.1**| | | | Yes |
+|**C.2**| | | | Partial (1) |
+|**C.3**| | | | Yes |
+|**C.4**| | | | Yes |
+|**C.5**| | | | Partial (1) |
+|**C.6**| | | | Yes |
+|**C.7**| | | | Partial (1) |
+|**C.8**| | | | Yes |
+|**C.9**| | | | Yes |
+|**C.10**| | | | Partial (2) |
+|**C.11**| | | | Partial (2) |
+|**C.12**| | | | Yes |
+|**C.13**| | | | Partial (1) |
+
+Notes:
+
+1. Client side activity required
+2. This depends on an artifact signing solution
