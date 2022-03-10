@@ -30,6 +30,7 @@ The following are categorized user stories
 1. As an artifact producer, I want be sure that pushing an artifact to a repository will not affect a copy of the same artifact previously created and referenced by a manifest list existing in another repository on the same registry.
 1. As a tool writer, I want to identify whether a registry supports reference types or not.
 1. As a tool writer, I would like the option to perform a server side blob mount when copying a large artifact between repositories.
+1. As a tool writer, I want to be able to include reference types within the Image Layout filesystem format.
 
 #### Content Management
 1. As a user, I want to store one or more artifacts in a registry with a reference to another related artifact.
