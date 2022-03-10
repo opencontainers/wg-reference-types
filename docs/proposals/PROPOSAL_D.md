@@ -18,6 +18,12 @@ The following proposal describes how existing OCI components can be used to prov
 ### JSON Schema
 
 The image-spec json schema is unchanged.
+
+The following annotations would be reserved:
+
+- "org.opencontainers.reference": this annotation is defined on an descriptor to an artifact and is set to the digest of another manifest that this artifact references.
+- "org.opencontainers.reference.type": this annotation is defined on descriptors and artifact manifests to indicate the type of artifact.
+
 The artifact is defined using the existing OCI Artifact definition (image-spec to a custom config media type):
 
 ```jsonc
