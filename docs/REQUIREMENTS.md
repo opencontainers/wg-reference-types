@@ -16,12 +16,12 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 The following are categorized user stories 
 
 #### Filtering
-1. As a user, I want to query a registry for stored artifacts by digest and tag.
-1. As a user, I want to query the registry for all stored artifacts that reference another artifact by its tag and digest.
-1. As a user, I want to query a registry for all stored artifacts of a particular type that reference another artifact by its tag and digest.
-1. As a user, I want to query a registry for all stored artifacts based on annotations that reference another artifact by its tag and digest.
+1. As a user, I want to query a registry for a stored artifact by its digest or tag.
+1. As a user, I want to query the registry for all stored artifacts that reference a given artifact by its digest or tag.
+1. As a user, I want to query a registry for all stored artifacts of a particular type that reference a given artifact by its digest or tag.
+1. As a user, I want to query a registry for all stored artifacts based on annotations that reference a given artifact by its digest or tag.
 1. As a user, I want to fetch the most up-to-date artifact, collection of artifacts, or application.
-1. As an artifact producer, I would like to reduce the number of tags that reference artifacts.
+1. As an artifact producer, I want to reduce the number of tags that reference an artifact.
 
 #### Backwards Compatibility
 1. As a user, I want to be sure that existing container runtimes are not affected by any other type of registry artifact.
