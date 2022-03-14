@@ -24,12 +24,12 @@ Link to [governance](./GOVERNANCE) document.
 
 The following proposals are currently being evaluated by the WG:
 
-| ID | Link                              | Description            |
-| -- | --------------------------------- | ---------------------- |
-| A  | [View](./docs/proposals/PROPOSAL_A.md) | *Reserved for Steve*   |
-| B  | [View](./docs/proposals/PROPOSAL_B.md) | *Reserved for Dan*     |
-| C  | [View](./docs/proposals/PROPOSAL_C.md) | Create Node manifest   |
-| D  | [View](./docs/proposals/PROPOSAL_D.md) | No Changes             |
+| ID | Link                                   | Description                               |
+| -- | -------------------------------------- | ----------------------------------------- |
+| A  | [View](./docs/proposals/PROPOSAL_A.md) | *Reserved for Steve*                      |
+| B  | [View](./docs/proposals/PROPOSAL_B.md) | Add "reference" field to existing schemas |
+| C  | [View](./docs/proposals/PROPOSAL_C.md) | Create Node manifest                      |
+| D  | [View](./docs/proposals/PROPOSAL_D.md) | No Changes                                |
 
 *Want to add a new proposal? Submit a PR following the format of the
 [template](./docs/TEMPLATE.md).*
