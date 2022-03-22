@@ -4,13 +4,13 @@ This proposal defines a new artifact manifest and corresponding referrers extens
 
 The modifications include:
 
-- [New artifact manifest](#artifact-manifest)
+- [New artifact manifest](#description)
 - [Descriptor (OPTIONAL) additional property](#descriptor-properties)
 - [Distribution - Referrers API](#registry-http-api)
 
-## Artifact Manifest
+## Description
 
-Provides an optional `subject` reference to another manifest (runtime image), an `artifactType` to differentiate types of artifacts (signatures, sboms, security scan results) and renames `layers` to optional `blobs`.
+Provides a new manifest type, with an optional `subject` reference to another manifest (runtime image), an `artifactType` to differentiate types of artifacts (signatures, sboms, security scan results) and renames `layers` to optional `blobs`.
 
 ## Links
 
@@ -20,7 +20,7 @@ Provides an optional `subject` reference to another manifest (runtime image), an
 | Current ORAS Specifications:   |  [Manifest](https://github.com/oras-project/artifacts-spec/blob/main/artifact-manifest.md) and [Referrers API](https://github.com/oras-project/artifacts-spec/blob/main/manifest-referrers-api.md) | 
 | Implementations | Registry: [ORAS Fork of CNCF Distribution (WIP)](https://github.com/oras-project/distribution/tree/ext_oras)<br>Registry: [ZOT Project (merged)](https://github.com/project-zot/zot/issues/264)<br>Registry client: [oras-project/oras/tree/artifacts](https://github.com/oras-project/oras/tree/artifacts) |
 
-### Modifications 
+## Modifications 
 
 The Artifact manifest is similar to the [OCI image manifest][oci-image-manifest-spec], but removes constraints defined on the image-manifest such as a required `config` object and required & ordinal `layers`.
 It adds a `subject` property supporting a graph of independently linked artifacts.
@@ -57,7 +57,7 @@ An Artifact manifest, representing a detached signature of the `hello-world@sha2
 }
 ```
 
-### Manifest Properties
+#### Manifest Properties
 
 - **`mediaType`** *string*
 
@@ -82,10 +82,14 @@ An Artifact manifest, representing a detached signature of the `hello-world@sha2
 
 - **`annotations`** *string-string map*
 
+    This OPTIONAL property contains arbitrary metadata for the artifact manifest.
+    This OPTIONAL property MUST use the [annotation rules][annotations-rules].
+    This map MAY contain some or all of the pre-defined keys in the image-spec, and those listed below
+
     **Pre-Defined Annotation Keys:**
     - `org.opencontainers.artifact.created` date and time on which the artifact was created (string, date-time as defined by [RFC 3339][rfc-3339])
 
-### Descriptor Properties
+#### Descriptor Properties
 
 Registries and clients work with descriptors as the means to establish discovery and links. To support hashing of different types, enabling filtering, the `artifactType` property is added as an OPTIONAL property to the descriptor: 
 
@@ -103,7 +107,7 @@ Registries and clients work with descriptors as the means to establish discovery
   This OPTIONAL property defines the type or Artifact, differentiating artifacts that use the `application/vnd.oci.artifact.manifest`.
   When the descriptor is used for blobs, this property MUST be empty.
 
-## Registry HTTP API
+### Registry HTTP API
 
 The `referrers` [extension API](https://github.com/opencontainers/distribution-spec/blob/main/extensions/README.md) is provided to discover these artifacts.
 An artifact client would parse the returned [artifact descriptors][descriptor], determining which  artifact manifest they will pull and process.
