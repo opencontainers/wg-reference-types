@@ -2,15 +2,15 @@
 
 This proposal defines a new artifact manifest and corresponding referrers extension API for registries to support reference types.
 
+## Description
+
+Provides a new manifest type, with an optional `subject` reference to another manifest (runtime image), an `artifactType` to differentiate types of artifacts (signatures, sboms, security scan results) and renames `layers` to optional `blobs`.
+
 The modifications include:
 
 - [New artifact manifest](#description)
 - [Descriptor (OPTIONAL) additional property](#descriptor-properties)
 - [Distribution - Referrers API](#registry-http-api)
-
-## Description
-
-Provides a new manifest type, with an optional `subject` reference to another manifest (runtime image), an `artifactType` to differentiate types of artifacts (signatures, sboms, security scan results) and renames `layers` to optional `blobs`.
 
 ## Links
 
