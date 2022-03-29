@@ -16,7 +16,9 @@ Link to [governance](./GOVERNANCE) document.
 ## Meetings
 
 * WG Meeting: [Tuesdays at 11:00am PT (Pacific Time)](https://zoom.us/j/92128676364) (weekly). [Convert to your timezone](https://dateful.com/convert/pt-pacific-time?t=11am).
-  * [Meeting notes and Agenda](https://docs.google.com/document/d/1SVOWQTowigXzbYdorzfa7tMmrcm91yK12LvSONqziJY/edit).
+* [Meeting notes and Agenda](https://hackmd.io/bGIxKAxPROi8KlwZMQioXQ?edit).
+* [Past Meetings](https://github.com/opencontainers/wg-reference-types/tree/main/minutes).
+* [Initial Google Doc](https://docs.google.com/document/d/1SVOWQTowigXzbYdorzfa7tMmrcm91yK12LvSONqziJY/edit)
 
 ## In Progress
 
