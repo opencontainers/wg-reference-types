@@ -1,6 +1,6 @@
 # Proposal A
 
-This proposal defines a new artifact manifest and corresponding referrers extension API for registries to support reference types.
+Defines a new artifact manifest and corresponding referrers extension API.
 
 ## Description
 
@@ -26,7 +26,7 @@ The Artifact manifest is similar to the [OCI image manifest][oci-image-manifest-
 It adds a `subject` property supporting a graph of independently linked artifacts.
 The addition of a new manifest does not change, nor impact the `image.manifest`.
 It provides a means to define a wide range of artifacts, including a chain of related artifacts enabling SBoMs, signatures and metadata that can be related to an `image.manifest`, `image.index` or another `artifact.manifest`.
-By defining a new manifest, registries and clients opt-into new capabilities, without breaking existing registry and client behavior or setting expectations for scenarios to function when the client and/or registry may not yet implement new capabilities
+By defining a new manifest, registries and clients opt-into new capabilities, without breaking existing registry and client behavior or setting expectations for scenarios to function when the client and/or registry may not yet implement new capabilities.
 
 ### JSON Schema
 
@@ -115,7 +115,7 @@ An artifact client would parse the returned [artifact descriptors][descriptor], 
 The `referrers` API returns all artifacts that have a `subject` of the given manifest digest.
 Reference artifact requests are scoped to a repository, ensuring access rights for the repository can be used as authorization for the referenced artifacts.
 
-### API Path
+#### API Path
 
 The `referrers` API is provided on the [distribution-spec][oci-distribution-spec] paths as described below.
 The path of the referrers API  provides consistent namespace/repository paths, enabling registry operators to implement consistent auth access, using existing tokens for content.
@@ -132,7 +132,7 @@ GET /v2/{repository}/_oci/artifacts/referrers?digest={digest}
 GET /v2/hello-world/_oci/artifacts/referrers?digest=sha256:abc123
 ```
 
-### Artifact Referrers API results
+#### Artifact Referrers API results
 
 - Implementations MUST implement [paging](#paging-results).
 - Implementations MUST implement [sorting](#sorting-results)
@@ -175,7 +175,7 @@ if there are no artifacts referencing the given manifest.
 }
 ```
 
-### Paging Results
+#### Paging Results
 
 The `referrers` API MUST provide for paging, returning a list of [artifact descriptors](./descriptor.md).
 Page size can be specified by adding a `n` parameter to the request URL, indicating that the response should be limited to `n` results.
@@ -242,7 +242,7 @@ The value of the header would be:
 
 Please see [RFC5988][rfc5988] for details.
 
-### Sorting Results
+#### Sorting Results
 
 The `/referrers` API MUST allow for artifacts to be sorted by the date and time in which they were created, which SHOULD be included in the artifact manifest's list of `annotations`.
 The artifact's creation time MUST be the value of the `org.oci.artifact.created` annotation.
@@ -250,7 +250,7 @@ The results of the `/referrers` API MUST list artifacts that were created more r
 Artifacts that do not have the `org.oci.artifact.created` annotation MUST appear after those with creation times specified in the list of results.
 There is no specified ordering for artifacts that do not include the creation time in their list of `annotations`.
 
-### Filtering Results
+#### Filtering Results
 
 The `referrers` API MAY provide for filtering of `artifactTypes`.
 Artifact clients MUST account for implementations that MAY NOT support filtering.
@@ -270,11 +270,11 @@ GET /v2/{repository}/_oci/artifacts/referrers?digest={digest}&n=10&artifactType=
 GET /v2/hello-world/_oci/artifacts/referrers?digest=sha256:abc123&n=10&artifactType=signature%2Fexample
 ```
 
-### Push Validation
+#### Push Validation
 
 Following the [distribution-spec push API](https://github.com/opencontainers/distribution-spec/blob/main/spec.md#push), all blobs *and* the `subject` descriptors SHOULD exist when pushed to a distribution instance.
 
-### Lifecycle Management
+#### Lifecycle Management
 
 Registries MAY treat the lifecycle of a reference type object, such as an SBoM or signature, as being tied to its `subject`. In such registries, when the `subject` is deleted or marked for garbage collection, the defined artifact is subject to deletion as well, unless the artifact is tagged.
 
