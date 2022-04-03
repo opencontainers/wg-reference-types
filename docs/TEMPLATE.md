@@ -50,7 +50,7 @@ to achieve the goals of this working group.
 
 Include code blocks of sample HTTP requests to illustrate your proposal:
 
-```
+```text
 GET /v2/<name>/manifests/<ref>/icecream
 ```
 
@@ -67,3 +67,15 @@ Response:
   }
 }
 ```
+
+## Requirements
+
+In this section, copy the distilled user stories from [REQUIREMENTS.md](REQUIREMENTS.md) and include a description of how each is handled by this proposal.
+
+### Filtering
+
+1. As a user, I want to query a registry for a stored artifact by its digest or tag.
+   - Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+1. As a user, I want to query the registry for all stored artifacts that reference a given artifact by its digest or tag.
+   - Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+...
