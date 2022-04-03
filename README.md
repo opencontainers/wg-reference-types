@@ -28,7 +28,7 @@ The following proposals are currently being evaluated by the WG:
 
 | ID | Link                                   | Description                               |
 | -- | -------------------------------------- | ----------------------------------------- |
-| A  | [View](./docs/proposals/PROPOSAL_A.md) | *Reserved for Steve*                      |
+| A  | [View](./docs/proposals/PROPOSAL_A.md) | Defines a new artifact manifest and corresponding referrers extension API |
 | B  | [View](./docs/proposals/PROPOSAL_B.md) | Add "reference" field to existing schemas |
 | C  | [View](./docs/proposals/PROPOSAL_C.md) | Create Node manifest                      |
 | D  | [View](./docs/proposals/PROPOSAL_D.md) | No Changes                                |
