@@ -8,14 +8,16 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Member-submitted user stories (Distilled)
 
 ### Top level definitions
+
 - An OCI artifact is defined as any artifact that is to be stored in an OCI registry.
 - A container image is a specialized OCI artifact as defined by the OCI [image](https://github.com/opencontainers/image-spec) and [runtime](https://github.com/opencontainers/runtime-spec) specifications.
 
 ### User stories
 
-The following are categorized user stories 
+The following are categorized user stories
 
 #### Filtering
+
 1. As a user, I want to query a registry for a stored artifact by its digest or tag.
 1. As a user, I want to query the registry for all stored artifacts that reference a given artifact by its digest or tag.
 1. As a user, I want to query a registry for all stored artifacts of a particular type that reference a given artifact by its digest or tag.
@@ -24,8 +26,9 @@ The following are categorized user stories
 1. As an artifact producer, I want to reduce the number of tags that reference an artifact.
 
 #### Backwards Compatibility
+
 1. As a user, I want to be sure that existing container runtimes are not affected by any other type of registry artifact.
-1. As a user, I want to move container images to and from registries that do not support reference types. 
+1. As a user, I want to move container images to and from registries that do not support reference types.
 1. As an artifact producer, I want to tag artifacts that I can pull by said tag, even if they contain references to other artifacts.
 1. As an artifact producer, I want be sure that pushing an artifact to a repository will not affect a copy of the same artifact previously created and referenced by a manifest list existing in another repository on the same registry.
 1. As a tool writer, I want to identify whether a registry supports reference types or not.
@@ -33,6 +36,7 @@ The following are categorized user stories
 1. As a tool writer, I want to be able to include reference types within the Image Layout filesystem format.
 
 #### Content Management
+
 1. As a user, I want to store one or more artifacts in a registry with a reference to another related artifact.
 1. As a user, when I delete an artifact, I want the option to delete one or more artifacts referencing it.
 1. As a user, I want to push an artifact that references another artifact that doesn't exist on the registry yet.
@@ -41,11 +45,11 @@ The following are categorized user stories
 1. As a registry operator, I want to allow users to "lock" the tags to their artifacts.
 1. As an artifact producer, I want to update an existing artifact with a newer artifact.
 1. As an artifact producer, I want to push multiple artifacts concurrently (possibly from separate systems) without encountering race conditions or other errors.
-1. As an artifact author, I want to document other artifacts in one or more registres that my artifact requires and/or provides.
+1. As an artifact author, I want to document other artifacts in one or more registries that my artifact requires and/or provides.
 1. As a user, I want assurances that the object I found really did come from the claimed supplier.
 1. As an artifact author, I want to add assurances that the artifact originated from me.
 1. As a registry operator, I want to provide users with retention policies for their artifacts.
-1. As a user, I want to apply timestamp or numerical ranges on my artifacts so I can apply retention policies on them. 
+1. As a user, I want to apply timestamp or numerical ranges on my artifacts so I can apply retention policies on them.
 
 ## Member-submitted user stories (Raw)
 
@@ -65,7 +69,7 @@ these apply to Artifacts too*
 
 ### Lachlan
 
-- As a user, I want to store a signature/SBOM/etc in a registry along with a reference to the container image <by digest?> it is for
+- As a user, I want to store a signature/SBOM/etc in a registry along with a reference to the container image (by digest?) it is for
 - As a user, I want to query the registry the signatures for a container image by name and tag
 - As a user, I want to query the registry for all stored objects that reference a container image by name and tag
 - As a user, I want to query the registry for stored objects that reference a container image filtering by type (eg. Signature, SBOM, etc) or by annotation (I want to see all signatures from this identity)
@@ -84,7 +88,7 @@ these apply to Artifacts too*
 - As a registry operator, I want to provide tag locking features that don’t preclude users from adding signatures or SBOMs to a tagged artifact
 - As an artifact author, I want to use multiple blobs/layers for reference types
 - As an artifact author, I want to push annotations (without blob data) as additional metadata, as reference types
-- As a security admin, I want to assure non-container artifacts, pushed to a registry doesn't add security risks to container runtime services that may pull the reference type 
+- As a security admin, I want to assure non-container artifacts, pushed to a registry doesn't add security risks to container runtime services that may pull the reference type
 - As a container image author, I want to support promotion of container images, and their references, across registries that may not yet support references
 - As a security scanner project/product, I want to know the type of each artifact so I know how to scan it for vulnerabilities, or if I should scan it. (example, scanners evaluate signatures, but don’t "scan" them)
 
