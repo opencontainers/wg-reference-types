@@ -168,16 +168,77 @@ For registries that do not support the `references` API, digest tags MUST be pus
 
 ## Requirements
 
-In this section, copy the distilled user stories from [REQUIREMENTS.md](REQUIREMENTS.md) and include a description of how each is handled by this proposal.
-
 ### Filtering
 
-... TBD ...
+1. As a user, I want to query a registry for a stored artifact by its digest or tag.
+   - Yes, artifacts may be pushed and pulled by tag.
+1. As a user, I want to query the registry for all stored artifacts that reference a given artifact by its digest or tag.
+   - Yes, queries to the API may be made by either, and registries without the API can be queried by listing the tags and searching for the appropriate tag digest.
+1. As a user, I want to query a registry for all stored artifacts of a particular type that reference a given artifact by its digest or tag.
+   - Yes, digest tags include a type, and the API allows filtering on annotations.
+1. As a user, I want to query a registry for all stored artifacts based on annotations that reference a given artifact by its digest or tag.
+   - Yes, registries that add the API may allow queries to annotations.
+1. As a user, I want to fetch the most up-to-date artifact, collection of artifacts, or application.
+   - Yes, registries that add the API may allow filtering and sorting based on annotations that would allow a client to quickly find an artifact with the most recent date in an annotation.
+1. As an artifact producer, I want to reduce the number of tags that reference an artifact.
+   - Yes, registries that add the API can associate artifacts with manifests without pushing digest tags.
 
 ### Backwards Compatibility
 
-... TBD ...
+1. As a user, I want to be sure that existing container runtimes are not affected by any other type of registry artifact.
+   - Yes, pulling existing images is not impacted by these changes.
+1. As a user, I want to move container images to and from registries that do not support reference types.
+   - Yes, if Image manifests are used, artifacts can be pushed both to and from OCI compatible registries without changing the digest of the artifact.
+     Digest tags are used on registries without the new API.
+1. As an artifact producer, I want to tag artifacts that I can pull by said tag, even if they contain references to other artifacts.
+   - Yes, artifacts may be pushed and pulled by tag.
+1. As an artifact producer, I want be sure that pushing an artifact to a repository will not affect a copy of the same artifact previously created and referenced by a manifest list existing in another repository on the same registry.
+   - Yes, artifacts with references are pushed separately from the manifests they reference.
+1. As a tool writer, I want to identify whether a registry supports reference types or not.
+   - Yes, this can be provided by either the OCI extensions discovery interface, or querying the references API and checking for an error.
+     When a query to the references API fails, the client should push a digest tag.
+1. As a tool writer, I would like the option to perform a server side blob mount when copying a large artifact between repositories.
+   - Yes, blob APIs are not impacted by this proposal.
+1. As a tool writer, I want to be able to include reference types within the Image Layout filesystem format.
+   - Yes, digest tags may be used within the Image Layout.
 
 ### Content Management
 
-... TBD ...
+1. As a user, I want to store one or more artifacts in a registry with a reference to another related artifact.
+   - Yes, references are created by the `reference` field and, for registries without the `references` API, a digest tag.
+1. As a user, when I delete an artifact, I want the option to delete one or more artifacts referencing it.
+   - Yes, references could be queried first and explicitly deleted.
+     Digest tags can be explicitly deleted.
+     Garbage collection should delete any untagged artifact if the `reference` field points to a non-existent manifest.
+1. As a user, I want to push an artifact that references another artifact that doesn't exist on the registry yet.
+   - Partial, digest tags do not require the target manifest to exist on that registry, but would require clients to query for that tag even if the registry supports the `references` API.
+     Alternatively, a registry with the `references` API would need to disable validation of the `reference` field and garbage collection of untagged artifacts, which is valid under OCI, but not expected to be a default configuration for most registries.
+     The `references` API would also need to support querying against a digest that doesn't exist.
+1. As a user, I want to move an artifact and one or more artifacts referencing it from one registry to another.
+   - Yes, after copying the artifact, the references should be recursively queried and copied.
+1. As a registry operator, I want to help users understand how they can manage the lifecycle of their artifacts.
+   - Yes, registry operators can configure their retention policies to support the `reference` field.
+     Registries without the `references` API would continue to use tag based retention policies.
+1. As a registry operator, I want to allow users to "lock" the tags to their artifacts.
+   - Yes, registries that enforce tag locking can still have artifacts pushed that refer to that locked artifact.
+     Digest tags include a unique hash to allow multiple references to the same artifact with minimal risk of a hash collision.
+1. As an artifact producer, I want to update an existing artifact with a newer artifact.
+   - Yes, artifacts may be pushed with unique creation annotations, and older artifacts can be explicitly deleted by the client.
+1. As an artifact producer, I want to push multiple artifacts concurrently (possibly from separate systems) without encountering race conditions or other errors.
+   - Yes, artifacts pushed either without a tag, or with a digest tag, are idempotent.
+1. As an artifact author, I want to document other artifacts in one or more registries that my artifact requires and/or provides.
+   - Partial, cross repository or registry references are not supported with the `references` API.
+     Digest tags may be used to point to digests that do not exist in the current repository.
+     Additional annotations could be defined to direct the client to search for content in another repository or registry.
+     The behavior of descriptors that include a `urls` field is unmodified by this proposal which potentially could define a `reference` to an external resource, but this is likely to create more issues than it would solve.
+1. As a user, I want assurances that the object I found really did come from the claimed supplier.
+   - Yes, artifacts may be signed, and those signatures may be pushed as a reference to the artifact.
+1. As an artifact author, I want to add assurances that the artifact originated from me.
+   - Yes, artifacts may be signed, and those signatures may be pushed as a reference to the artifact.
+1. As a registry operator, I want to provide users with retention policies for their artifacts.
+   - Yes, registry operators can configure their retention policies to support the `reference` field.
+     Registries without the `references` API would continue to use tag based retention policies.
+1. As a user, I want to apply timestamp or numerical ranges on my artifacts so I can apply retention policies on them.
+   - Partial, an artifact may have an annotation added with a timestamp, version, or similar value.
+     These annotations could be queried and a retention policy could be created either by the client or a registry server.
+     However, this proposal doesn't introduce a specific capability, and leaves retention policies undefined since they are not currently in scope within OCI.
