@@ -30,13 +30,16 @@ The result is the following upgrade path:
 
 ## Modifications
 
-### Annotations
+### JSON Schema
+
+#### Annotations
 
 These annotations would be added for artifacts:
 
 - `org.opencontainers.artifact.type`: type of artifact (sig, sbom, etc)
 - `org.opencontainers.artifact.description`: human readable description for the artifact
 - `org.opencontainers.artifact.created`: creation time for a manifest
+- `org.opencontainers.references.params`: base64 encoded parameters processed by references API
 
 Additional annotations should be considered for filtering various artifact types, e.g. signature public key hash, attestation type, and sbom schema.
 
@@ -44,11 +47,12 @@ These annotations should be considered from the current config schema:
 
 - `org.opencontainers.platform.architecture`: CPU architecture for binaries
 - `org.opencontainers.platform.os`: operating system for binaries
+- `org.opencontainers.platform.os.version`: operating system version for binaries
 - `org.opencontainers.platform.variant`: variant of the CPU architecture for binaries
 
 Existing `org.opencontainers.image.*` annotations should be reviewed to consider more generic names (e.g. replacing `image` with `manifest` or `artifact`).
 
-### JSON Schema
+#### Image Spec
 
 Extend the Image Manifest with a reference field (existing registries should ignore this per OCI's extensibility requirement):
 
@@ -62,15 +66,15 @@ Extend the Image Manifest with a reference field (existing registries should ign
     "mediaType": "application/vnd.oci.image.manifest.v1+json", // any manifest media type
     "size": 1234,
     "digest": "sha256:a1a1a1...",
-    "annotations": [
-      // pull up annotations from referenced manifest here
-    ]
+    "annotations": []
   },
   "annotations": [
     // annotations for this artifact here
   ]
 }
 ```
+
+#### Artifact Spec
 
 Create a new artifact media type to support future use cases where a separate config blob, and an ordered list of blobs, may not match an artifact's use case:
 
@@ -93,7 +97,9 @@ Create a new artifact media type to support future use cases where a separate co
 
 ### Registry HTTP API
 
-Add the following `references` API:
+#### References API
+
+Add the following `references` API (`<ref>` is the digest in the `reference` schema field):
 
 ```text
 GET /v2/<name>/references/<ref>
@@ -129,28 +135,72 @@ The response is an Index of descriptors:
     }
   ],
   "annotations": [
-    // optional annotations indicating pagination, sort, and filter settings
+    "org.opencontainers.references.params": "..." // optional base64 encoded parameters
   ]
 }
 ```
+
+If a registry does not implement the `references` API, it MUST return a 404.
+If a query results in no references found, an empty manifest list MUST be returned.
 
 #### Ordering and Pagination
 
 - The registry MUST order the results in a way that allows pagination.
 - Adding the `n` query parameter is used to limit the number of entries per index returned.
+- The registry SHOULD return fewer than `n` results when the generated Index would exceed the recommended maximum manifest size.
 - The `Link` HTTP header is included in the response when additional results are available and is set to the URL for the next page of results.
 
 #### Filtering and Sorting
 
-- The registry SHOULD support filtering by annotation using the `filter=<url encoded "name=value">` parameter.
-- Multiple filter parameters may be set on a request, results must match all filters.
-- TBD: More advanced query semantics (e.g. glob, regex, prefix, lists, inverse query).
-- The registry SHOULD support sorting by annotation using the `sort=name` parameter.
-- Artifacts without a specified sorting annotation are sorted last.
-- TBD: Reversing the sort order is needed (prepend a `-` to the name, `sortDesc` parameter, align with how others do this).
-- TBD: an HTTP header or an Index annotation is needed for clients to discover when the returned result supported custom sorting and/or filtering.
+- The registry SHOULD support filtering by annotation using the `filter=<field><op><value>` parameter.
+  - Values after the `filter=` are url encoded.
+  - Multiple filter parameters may be set on a request, results must match all filters.
+  - `<field>` is an annotation name.
+  - Supported `<op>` values are:
+    - `==`: equals
+    - `=!=`: not equals
+    - `=gt=`: greater than string comparison
+    - `=ge=`: greater than or equal string comparison
+    - `=lt=`: less than string comparison
+    - `=le=`: less than or equal string comparison
+    - Future operators will always start and end with a `=`.
+    - Unknown and unsupported operators should be ignored.
+  - `<value>` is compared to the annotation value.
+  - Clients should be prepared for any or all filter requests to be ignored.
+- The registry SHOULD support sorting by annotation values using the `sort=<dir>:<field>` parameter.
+  - Values after the `sort=` are url encoded.
+  - `<dir>` is `asc` or `desc` for ascending or descending string sorting, respectively
+  - `<field>` is any annotation.
+  - Multiple sort entries can be included with a comma separator, the entries to the left take precedence (`sort=<dir>:<field1>,<dir>:<field2>`).
+  - Artifacts without a specified annotation are sorted last regardless of the `<dir>` value.
+- String based sorting/comparisons:
+  - Sorting is based on the UTF-8 character set.
+  - Longer strings are sorted greater than a matching prefix ("abc" > "ab").
 
-### Digest Tags
+Example: To show the most recent ice cream artifact with the chocolate flavor (linefeeds added for readability):
+
+```text
+GET /v2/project-e/references/00000...00000?n=1&
+      filter=org.opencontainers.artifact.type%3D%3Dexample%2Ficecream&
+      filter=org.example.icecream.flavor%3D%3Dchocolate&
+      sort=desc:org.opencontainers.artifact.created
+```
+
+The result SHOULD include the annotation `org.opencontainers.references.params` set to the base64 encoding of the following content:
+
+```jsonc
+{
+  "filter": [
+    "org.opencontainers.artifact.type==example/icecream",
+    "org.example.icecream.flavor==chocolate"
+  ],
+  "sort": "desc:org.opencontainers.artifact.created"
+}
+```
+
+If the filter or sort params from the registry do not match expected values, the client MUST perform filtering and sorting on the result itself.
+
+#### Digest Tags
 
 For registries that do not support the `references` API, digest tags MUST be pushed for any manifest containing a `reference` descriptor with the following syntax:
 
@@ -162,9 +212,11 @@ For registries that do not support the `references` API, digest tags MUST be pus
 - `<alg>`: the digest algorithm
 - `<ref>`: the referenced digest (limit of 64 characters)
 - `<hash>`: hash of this artifact (limit of 16 characters)
-- `<type>`: type of artifact for filtering
-- Adding a short hash of the artifact allows multiple artifacts of the same type with little risk of collision or race conditions.
+- `<type>`: type of artifact for filtering (limit of 5 characters)
+- Querying for references requires the client to get the tag listing, and filter for matching `<alg>`, `<ref>`, and `<type>` entries.
+- Adding a `<hash>` of the artifact allows multiple artifacts of the same type to exist with little risk of collision or race conditions.
 - Periodic garbage collection may be performed by clients pushing new references, deleting stale references that have been replaced with newer versions, and tags that no longer point to an accessible manifest.
+- Clients can verify the registry does not support the `references` API by querying the API and checking for a 404.
 
 ## Requirements
 
