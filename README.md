@@ -32,6 +32,7 @@ The following proposals are currently being evaluated by the WG:
 | B  | [View](./docs/proposals/PROPOSAL_B.md) | Add "reference" field to existing schemas |
 | C  | [View](./docs/proposals/PROPOSAL_C.md) | Create Node manifest                      |
 | D  | [View](./docs/proposals/PROPOSAL_D.md) | No Changes                                |
+| E  | [View](./docs/proposals/PROPOSAL_E.md) | Cherry pick                               |
 
 *Want to add a new proposal? Submit a PR following the format of the
 [template](./docs/TEMPLATE.md).*
