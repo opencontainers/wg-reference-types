@@ -202,13 +202,13 @@ If the filter or sort params from the registry do not match expected values, the
 
 #### Digest Tags
 
-For registries that do not support the `references` API, digest tags MUST be pushed for any manifest containing a `reference` descriptor with the following syntax:
+For registries that do not support the `references` API, tags MUST be pushed for any manifest containing a `reference` descriptor with the following syntax:
 
 ```text
-<repo>:<alg>-<ref>.<hash>.<type>
+<alg>-<ref>.<hash>.<type>
 ```
 
-- E.g. `registry.example.org/project-e:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
+- E.g. `registry.example.org/project:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
 - `<alg>`: the digest algorithm
 - `<ref>`: the referenced digest (limit of 64 characters)
 - `<hash>`: hash of this artifact (limit of 16 characters)
