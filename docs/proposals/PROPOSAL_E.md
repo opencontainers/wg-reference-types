@@ -168,16 +168,16 @@ Clients SHALL NOT expect manifests uploaded before the [referrers API](#referrer
 
 #### Digest Tags
 
-For registries that do not support the `referrers` API, digest tags MUST be pushed for any manifest containing a `refers` descriptor with the following syntax:
+For registries that do not support the `referrers` API, a tag MUST be pushed for any manifest containing a `refers` descriptor with the following syntax:
 
 ```text
-<repo>:<alg>-<ref>.<hash>.<type>
+<alg>-<ref>.<hash>.<type>
 ```
 
-- E.g. `registry.example.org/project-e:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
+- E.g. `registry.example.org/project:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
 - `<alg>`: the digest algorithm
-- `<ref>`: the digest of the referred artifact (limit of 64 characters)
-- `<hash>`: hash of this artifact (limit of 16 characters)
+- `<ref>`: the digest from the `refers` field (limit of 64 characters)
+- `<hash>`: the digest of this artifact (limit of 16 characters)
 - `<type>`: type of artifact for filtering (limit of 5 characters)
 - Querying for referrers requires the client to get the tag listing, and filter for matching `<alg>`, `<ref>`, and `<type>` entries.
 - Adding a `<hash>` of the artifact allows multiple artifacts of the same type to exist with little risk of collision or race conditions.
