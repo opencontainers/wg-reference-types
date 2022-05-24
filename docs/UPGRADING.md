@@ -20,8 +20,8 @@ A producer of images and/or artifacts (a client that "pushes")
 
 | Icon              | State        | Description                          |
 | ----------------- | ------------ | ------------------------------------ |
-| 🌱  (leaf)        | Current      | Cannot push references         |
-| 🌿  (tree branch) | Intermediate | Pushes references via tags/"refers" field           |
+| 🌱  (leaf)        | Current      | Build tooling that does not push references     |
+| 🌿  (tree branch) | Intermediate | Pushes image-spec manifests with "refers" field, includes tags if refers API missing           |
 | 🌲  (whole tree)  | Complete     | Pushes references using new manifest |
 
 #### Registry
@@ -30,7 +30,7 @@ A service that hosts images and/or artifacts
 
 | Icon            | State        | Description |
 | --------------  | ------------ | -- |
-| 🚲 (bicycle)    | Current      | References supported via tags/"refers" field |
+| 🚲 (bicycle)    | Current      | References supported via tags/"refers" field in existing image-spec manifest |
 | ~~🛵 (moped)~~*      | ~~Intermediate~~ | ~~N/A~~ |
 | 🏍 (motocycle)  | Complete     | Supports new API and manifest |
 
@@ -42,9 +42,9 @@ A consumer of images and/or artifacts (a client that "pulls")
 
 | Icon          | State        | Description |
 | ------------- | ------------ | -- |
-| 🐀 (rat)      | Current      |  Cannot discover references |
-| 🐿 (squirrel) | Intermediate | Discovers references via tags |
-| 🦫 (beaver)   | Complete     | Discovers references via new API  |
+| 🐀 (rat)      | Current      |  Existing runtime that is unaware of refers |
+| 🐿 (squirrel) | Intermediate | Discovers image-spec manifest references via refers API, falls back to tags if refers API is missing |
+| 🦫 (beaver)   | Complete     | Discovers referrers via new API and manifest  |
 
 ### Scenarios
 
@@ -53,24 +53,24 @@ Note: supported scenarios have descriptions in **bold**.
 
 |   | Producer  | Registry | Consumer | Description |
 | - | ----------|----------|----------|-------------|
-| 1 | 🌱  | 🚲  | 🐀  | Present state, no refers |
-| 2 | 🌱  | 🚲  | 🐿  | Consumer looking for refers that don't exist |
-| 3 | 🌱  | 🚲  | 🦫  | Consumer looking for refers that don't exist |
-| 4 | 🌱  | 🏍   | 🐀  | Present state, no refers |
-| 5 | 🌱  | 🏍   | 🐿  | Consumer looking for refers that don't exist |
-| 6 | 🌱  | 🏍   | 🦫  | Consumer looking for refers that don't exist |
-| 7 | 🌿  | 🚲   | 🐀  | Producer creating refers consumer won't see |
+| 1 | 🌱  | 🚲  | 🐀  | **Present state, no refers** |
+| 2 | 🌱  | 🚲  | 🐿  | **Consumer looking for refers that don't exist** |
+| 3 | 🌱  | 🚲  | 🦫  | **Consumer looking for refers that don't exist** |
+| 4 | 🌱  | 🏍   | 🐀  | **Present state, no refers** |
+| 5 | 🌱  | 🏍   | 🐿  | **Consumer looking for refers that don't exist** |
+| 6 | 🌱  | 🏍   | 🦫  | **Consumer looking for refers that don't exist** |
+| 7 | 🌿  | 🚲   | 🐀  | **Producer creating refers, consumer isn't using refers and is not impacted** |
 | 8 | 🌿  | 🚲   | 🐿  | **Producer / consumer working in compatibility mode with tags** |
-| 9 | 🌿  | 🚲   | 🦫  | **Consumer downgrades to find refers via tags** |
-| 10 | 🌿  | 🏍   | 🐀  | Producer creating refers consumer won't see |
-| 11 | 🌿  | 🏍   | 🐿  | **Producer / consumer working in compatibility mode with tags** |
-| 12 | 🌿  | 🏍   | 🦫  | **Producer pushes tags, consumer finds refers via new API** |
-| 13 | 🌲  | 🚲  | 🐀  | Producer creating refers consumer won't see |
-| 14 | 🌲  | 🚲  | 🐿  | **Producer downgrades to push refers via tags** |
-| 15 | 🌲  | 🚲  | 🦫  | **Producer downgrades to push refers via tags** |
-| 16 | 🌲  | 🏍  | 🐀  | Producer creating refers consumer won't see |
-| 17 | 🌲  | 🏍  | 🐿  | **Producer pushes new manifest, consumer finds refers via new API** |
-| 18 | 🌲  | 🏍  | 🦫  | **Producer / consumer working using complete new API** |
+| 9 | 🌿  | 🚲   | 🦫  | **Consumer wants artifact-spec, but can fall back to image-spec refers using tags** |
+| 10 | 🌿  | 🏍   | 🐀  | **Producer creating refers, consumer isn't using refers and is not impacted** |
+| 11 | 🌿  | 🏍   | 🐿  | **Producer / consumer using image-spec manifests and referrers API** |
+| 12 | 🌿  | 🏍   | 🦫  | **Producer pushes image-spec manifest, consumer discovers refers via new API and would prefer new manifest** |
+| 13 | 🌲  | 🚲  | 🐀  | Producer attempts to push new manifest, registry rejects as new manifest is unknown |
+| 14 | 🌲  | 🚲  | 🐿  | Producer attempts to push new manifest, registry rejects as new manifest is unknown |
+| 15 | 🌲  | 🚲  | 🦫  | Producer attempts to push new manifest, registry rejects as new manifest is unknown |
+| 16 | 🌲  | 🏍  | 🐀  | **Producer creates new manifest, consumer isn't using refers and is not impacted** |
+| 17 | 🌲  | 🏍  | 🐿  | Producer pushes new manifest, consumer finds refers via new API but cannot parse new manifest |
+| 18 | 🌲  | 🏍  | 🦫  | **Producer and consumer both use new manifest and API** |
 
 ### Registry Transition
 
