@@ -11,7 +11,7 @@ to the original proposal to create this working group.
 
 ## Governance
 
-Link to [governance](./GOVERNANCE) document.
+Link to [governance](./GOVERNANCE.md) document.
 
 ## Meetings
 
