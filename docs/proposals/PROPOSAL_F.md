@@ -35,7 +35,7 @@ Reference annotations are added to the [Annotations](https://github.com/opencont
 Example of a reference OCI descriptor, pointing to a SBOM referencing an alpine image on a specific platform:
 ```json
 {
-   "mediaType": "application/vnd.cncf.oras.artifact.manifest.v1+json",
+   "mediaType": "application/vnd.oci.image.manifest.v1+json",
    "digest": "sha256:5b0044a1244...",
    "size": 1024,
    "annotations": {
@@ -49,6 +49,7 @@ Example of a reference OCI descriptor, pointing to a SBOM referencing an alpine 
 #### Well-known annotations
 A **well-known** annotations section is added to the [Annotations](https://github.com/opencontainers/image-spec/blob/main/annotations.md) section.
 Those annotations **SHOULD** be added to the referenced image descriptor.
+An encountered annotation that is unknown to the implementation **MUST** be ignored.
 The annotations **MAY** store small data.
 The list will evolve depending adoption.
 
@@ -63,15 +64,7 @@ Example of well-known annotations, adding cosign signatures to an image:
       "os": "linux"
    },
    "annotations": {
-      "dev.cosignproject.cosign/signature.e59879c": "...",
-      "dev.sigstore.cosign/bundle.6436749": "...",
-      "dev.sigstore.cosign/certificate.776a3f1": "...",
-      "dev.sigstore.cosign/chain.8adf60e": "...",
-      "dev.cosignproject.cosign/signature.de25bf6": "...",
-      "dev.sigstore.cosign/bundle.37d34ff": "...",
-      "dev.sigstore.cosign/certificate.e8adf60": "...",
-      "dev.sigstore.cosign/chain.b1c64a3": "...",
-      "org.opencontainers.signatures.index":"dev.cosignproject.cosign/signature.e59879c,dev.cosignproject.cosign/signature.de25bf6,dev.sigstore.cosign/bundle.37d34ff,dev.sigstore.cosign/certificate.e8adf60,dev.sigstore.cosign/chain.b1c64a3,dev.sigstore.cosign/bundle.6436749,dev.sigstore.cosign/certificate.776a3f1,dev.sigstore.cosign/chain.8adf60e",
+      "org.favorite.icecream": "rocky-road"
    }
 }
 ```
@@ -88,11 +81,10 @@ Two scenarii are identified for the [Ice Cream Factory Worker 🏭](https://gith
 
 An image is already pushed and used. To add artifacts and annotations to it without re-pushin and changing the known digest, a new OCI index is pushed on a new tag, referencing the original image.
 The tag **SHOULD** have the following format:
-`<repo>:<alg>-<ref>.<hash>`:
-- E.g. `registry.example.org/project-d:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404`
+`<repo>:<alg>-<ref>`:
+- E.g. `registry.example.org/project-d:sha256-0000000000000000000000000000000000000000000000000000000000000000`
 - `<alg>`: the digest algorithm
 - `<ref>`: the referenced digest (limit of 64 characters)
-- `<hash>`: hash of this artifact (limit of 16 characters)
 
 If the referenced image is an OCI Index, the manifests **SHOULD** be inserted first, for backward compatibility with runtimes.
 Runtimes select the first matching manifest when they do not understand the artifact annotations.
@@ -101,7 +93,7 @@ This is specified in the [OCI image-spec index definition](image-spec-index):
 > If multiple manifests match a client or runtime's requirements, the first matching entry SHOULD be used.
 
 Example:
-```json
+```jsonc
 // Original image, pushed to registry.example.org/project-d:v1
 {
    "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
@@ -138,15 +130,7 @@ Example:
          "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
          "size": 1024,
          "annotations": {
-            "dev.cosignproject.cosign/signature.e59879c": "...",
-            "dev.sigstore.cosign/bundle.6436749": "...",
-            "dev.sigstore.cosign/certificate.776a3f1": "...",
-            "dev.sigstore.cosign/chain.8adf60e": "...",
-            "dev.cosignproject.cosign/signature.de25bf6": "...",
-            "dev.sigstore.cosign/bundle.37d34ff": "...",
-            "dev.sigstore.cosign/certificate.e8adf60": "...",
-            "dev.sigstore.cosign/chain.b1c64a3": "...",
-            "org.opencontainers.signatures.index":"dev.cosignproject.cosign/signature.e59879c,dev.cosignproject.cosign/signature.de25bf6,dev.sigstore.cosign/bundle.37d34ff,dev.sigstore.cosign/certificate.e8adf60,dev.sigstore.cosign/chain.b1c64a3,dev.sigstore.cosign/bundle.6436749,dev.sigstore.cosign/certificate.776a3f1,dev.sigstore.cosign/chain.8adf60e"
+            "org.favorite.icecream": "mint-chocolate"
          }
       },
       // Original manifests, for old runtimes, as fallback
@@ -160,15 +144,7 @@ Example:
          },
          // signatures added to the linux/arm64
          "annotations": {
-            "dev.cosignproject.cosign/signature.e59879c": "...",
-            "dev.sigstore.cosign/bundle.6436749": "...",
-            "dev.sigstore.cosign/certificate.776a3f1": "...",
-            "dev.sigstore.cosign/chain.8adf60e": "...",
-            "dev.cosignproject.cosign/signature.de25bf6": "...",
-            "dev.sigstore.cosign/bundle.37d34ff": "...",
-            "dev.sigstore.cosign/certificate.e8adf60": "...",
-            "dev.sigstore.cosign/chain.b1c64a3": "...",
-            "org.opencontainers.signatures.index":"dev.cosignproject.cosign/signature.e59879c,dev.cosignproject.cosign/signature.de25bf6,dev.sigstore.cosign/bundle.37d34ff,dev.sigstore.cosign/certificate.e8adf60,dev.sigstore.cosign/chain.b1c64a3,dev.sigstore.cosign/bundle.6436749,dev.sigstore.cosign/certificate.776a3f1,dev.sigstore.cosign/chain.8adf60e"
+            "org.favorite.icecream": "banana"
          }
       },
       {
@@ -222,7 +198,7 @@ Example:
 An enhanced image can be pushed directly, with all metadata annotations and references.
 There is no need to nest index in this scenario.
 
-```json
+```jsonc
 {
    "mediaType": "application/vnd.oci.image.index.v1+json",
    "schemaVersion": 2,
@@ -328,7 +304,7 @@ Querying for a reference involves pulling either existing tags pointing to an in
 1. As a user, I want to be sure that existing container runtimes are not affected by any other type of registry artifact.
    - Yes: Testing is needed to verify that an index with entries without a platform or with an unknown platform will not break processing of other entries.
 1. As a user, I want to move container images to and from registries that do not support reference types.
-   - Yes: This proposal does not require changes to the registry.
+   - Yes: This proposal does not require changes to the registry. Testing is needed to verify that a registry supports nested OCI Index.
 1. As an artifact producer, I want to tag artifacts that I can pull by said tag, even if they contain references to other artifacts.
    - Yes: Artifacts can be pulled by tag.
 1. As an artifact producer, I want be sure that pushing an artifact to a repository will not affect a copy of the same artifact previously created and referenced by a manifest list existing in another repository on the same registry.
@@ -361,7 +337,7 @@ Querying for a reference involves pulling either existing tags pointing to an in
 1. As an artifact producer, I want to update an existing artifact with a newer artifact.
    - Yes: New artifacts are associated by pushing the artifact and the unique tag referencing the target manifest.
 1. As an artifact producer, I want to push multiple artifacts concurrently (possibly from separate systems) without encountering race conditions or other errors.
-   - Yes: Each artifact may be pushed separately with a unique artifact manifest and tag that references the target manifest.
+   - No: If two manifests with the same digest are pushed to the same registry path, a race condition will occur. However, this problem exists in current registries.
 1. As an artifact author, I want to document other artifacts in one or more registries that my artifact requires and/or provides.
    - Yes: Unique tags could reference the digest of a manifest in a different registry.
 1. As a user, I want assurances that the object I found really did come from the claimed supplier.
