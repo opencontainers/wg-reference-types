@@ -25,11 +25,11 @@ All existing supported JSON schemas (index/manifest/descriptor) will be allowed 
 
 ```jsonc
 {
-  "mediaType": "icecream/scoops.vanilla.v1.json",
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
   "size": 2345,
   "digest": "sha256:b2b2b2...",
-  "reference": { // <----- New field
-    "mediaType": "icecream/cone.v1.json",
+  "reference": { // new field
+    "mediaType": "application/vnd.oci.image.manifest.v1+json", // any manifest media type
     "size": 1234,
     "digest": "sha256:a1a1a1..."
   }
@@ -46,16 +46,6 @@ GET /v2/<name>/manifests/<ref>/references
 
 The response will be a valid [index](https://github.com/opencontainers/image-spec/blob/main/specs-go/v1/index.go#L21), containing a `manifests` array, which is the complete list of descriptor objects referencing a given `<ref>` (tag or digest) on a given `<name>` (repo).
 
-```jsonc
-{
-  "manifests": [
-    <descriptor1>,
-    <descriptor2>,
-    ...
-  ]
-}
-```
-
 For example:
 
 ```
@@ -64,22 +54,27 @@ GET /v2/products/cones/manifests/neapolitan/references
 
 ```jsonc
 {
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
   "manifests": [
     {
-      "mediaType": "icecream/scoops.vanilla.v1.json",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "size": 2345,
       "digest": "sha256:b2b2b2..."
     },
     {
-      "mediaType": "icecream/scoops.chocolate.v1.json",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "size": 2345,
       "digest": "sha256:c3c3c3..."
     },
     {
-      "mediaType": "icecream/scoops.strawberry.v1.json",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "size": 2345,
       "digest": "sha256:d4d4d4..."
     }
+  ],
+  "annotations": [
+    // reserved for future use
   ]
 }
 ```
