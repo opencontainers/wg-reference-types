@@ -289,22 +289,27 @@ Querying for a reference involves pulling either existing tags pointing to an in
 1. As a user, I want to query a registry for a stored artifact by its digest or tag.
    - Yes: Artifacts can be pushed and pulled by tag.
 1. As a user, I want to query the registry for all stored artifacts that reference a given artifact by its digest or tag.
-   - Yes: The index stores all the artifacts referencing the given tag or digest.
+   - Partial: The index stores all the artifacts referencing the given tag or digest.
+     It is not possible to query artifacts referencing a digest pointing to an image manifest without having a reference to the parent index.
 1. As a user, I want to query a registry for all stored artifacts of a particular type that reference a given artifact by its digest or tag.
-   - Yes: The index stores all the artifacts referencing the given tag or digest, the client can filter per type.
+   - Partial: The index stores all the artifacts referencing the given tag or digest, the client can filter per type.
+     It is not possible to query artifacts referencing a digest pointing to an image manifest without having a reference to the parent index.
 1. As a user, I want to query a registry for all stored artifacts based on annotations that reference a given artifact by its digest or tag.
-   - Yes: The index stores all the artifacts referencing the given tag or digest, the client can filter per annotation.
+   - Partial: The index stores all the artifacts referencing the given tag or digest.
+     The client must pull manifests for each artifact to filter by annotation.
+     It is not possible to query artifacts referencing a digest pointing to an image manifest without having a reference to the parent index.
 1. As a user, I want to fetch the most up-to-date artifact, collection of artifacts, or application.
    - Yes: The tagged index returned by the registry stores all the artifacts referencing the given tag.
 1. As an artifact producer, I want to reduce the number of tags that reference an artifact.
-   - Yes: Only one tag for everything.
+   - Partial: The image originator may push a single tag.
+     Extending that without changing the digest requires an additional tag using a digest schema.
 
 ### Backwards Compatibility
 
 1. As a user, I want to be sure that existing container runtimes are not affected by any other type of registry artifact.
-   - Yes: Testing is needed to verify that an index with entries without a platform or with an unknown platform will not break processing of other entries.
+   - TBD: Testing is needed to verify that an index with entries without a platform or with an unknown platform will not break processing of other entries.
 1. As a user, I want to move container images to and from registries that do not support reference types.
-   - Yes: This proposal does not require changes to the registry. Testing is needed to verify that a registry supports nested OCI Index.
+   - Partial: Some registries do not support a nested OCI Index.
 1. As an artifact producer, I want to tag artifacts that I can pull by said tag, even if they contain references to other artifacts.
    - Yes: Artifacts can be pulled by tag.
 1. As an artifact producer, I want be sure that pushing an artifact to a repository will not affect a copy of the same artifact previously created and referenced by a manifest list existing in another repository on the same registry.
@@ -319,7 +324,7 @@ Querying for a reference involves pulling either existing tags pointing to an in
 ### Content Management
 
 1. As a user, I want to store one or more artifacts in a registry with a reference to another related artifact.
-   - Yes: References are created using the unique tag syntax.
+   - Yes: References may be created using the unique tag syntax.
 1. As a user, when I delete an artifact, I want the option to delete one or more artifacts referencing it.
    - Partial: Clients that delete a manifest should also delete tags with a digest referencing that manifest.
      A client-side GC could also be created to prune digest tags for digests that are no longer available in that repository.
@@ -332,12 +337,12 @@ Querying for a reference involves pulling either existing tags pointing to an in
 1. As a registry operator, I want to help users understand how they can manage the lifecycle of their artifacts.
    - Partial: Lifecycle management depends on client-side processing to remove tags to artifacts that should be deleted.
 1. As a registry operator, I want to allow users to "lock" the tags to their artifacts.
-   - Yes: Tag locking can be used with the unique tags to extend existing manifests with new artifact references.
-     There is no need to mutate existing tags, and the originator can package their index in advance to push once with the images and all reference artifacts together.
+   - Partial: Once the original tag has been pushed, a single digest schema tag can be pushed with any added artifacts.
+     It is not possible to push additional digest schema tags to add additional referrers to an index without changing an existing tag.
 1. As an artifact producer, I want to update an existing artifact with a newer artifact.
    - Yes: New artifacts are associated by pushing the artifact and the unique tag referencing the target manifest.
 1. As an artifact producer, I want to push multiple artifacts concurrently (possibly from separate systems) without encountering race conditions or other errors.
-   - No: If two manifests with the same digest are pushed to the same registry path, a race condition will occur. However, this problem exists in current registries.
+   - No: If two manifests with the same tag are pushed, one push will be overwritten by the other. This is similar to the issue experienced creating multi-platform manifests today.
 1. As an artifact author, I want to document other artifacts in one or more registries that my artifact requires and/or provides.
    - Yes: Unique tags could reference the digest of a manifest in a different registry.
 1. As a user, I want assurances that the object I found really did come from the claimed supplier.
