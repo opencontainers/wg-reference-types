@@ -32,28 +32,9 @@ The result is the following upgrade path:
 
 ### JSON Schema
 
-#### Annotations
+#### Artifact Manifest
 
-These annotations would be added for artifacts:
-
-- `org.opencontainers.artifact.type`: type of artifact (sig, sbom, etc)
-- `org.opencontainers.artifact.description`: human readable description for the artifact
-- `org.opencontainers.artifact.created`: creation time for a manifest
-
-Additional annotations should be considered for filtering various artifact types, e.g. signature public key hash, attestation type, and sbom schema.
-
-These annotations should be considered from the current config schema:
-
-- `org.opencontainers.platform.architecture`: CPU architecture for binaries
-- `org.opencontainers.platform.os`: operating system for binaries
-- `org.opencontainers.platform.os.version`: operating system version for binaries
-- `org.opencontainers.platform.variant`: variant of the CPU architecture for binaries
-
-Existing `org.opencontainers.image.*` annotations should be reviewed to consider more generic names (e.g. replacing `image` with `manifest` or `artifact`).
-
-#### Artifact Spec
-
-Create a new artifact media type to support future use cases where a separate config blob, and an ordered list of blobs, may not match an artifact's use case:
+This proposal introduces a new artifact media type to support future use cases:
 
 ```jsonc
 {
@@ -71,6 +52,25 @@ Create a new artifact media type to support future use cases where a separate co
   ]
 }
 ```
+
+#### Annotations
+
+The following optional annotations should be added to the artifact manifest:
+
+- `org.opencontainers.artifact.type`: type of artifact (sig, sbom, etc)
+- `org.opencontainers.artifact.description`: human readable description for the artifact
+- `org.opencontainers.artifact.created`: creation time for a manifest
+
+Additional annotations should be considered for filtering various artifact types, e.g. signature public key hash, attestation type, and sbom schema.
+
+To maintain backwards compatibility, these annotations should be considered from the current config schema:
+
+- `org.opencontainers.platform.architecture`: CPU architecture for binaries
+- `org.opencontainers.platform.os`: operating system for binaries
+- `org.opencontainers.platform.os.version`: operating system version for binaries
+- `org.opencontainers.platform.variant`: variant of the CPU architecture for binaries
+
+Existing `org.opencontainers.image.*` annotations should be reviewed to consider more generic names (e.g. replacing `image` with `manifest` or `artifact`).
 
 #### Image Spec
 
@@ -159,14 +159,7 @@ If a query results in no referrers found, an empty manifest list MUST be returne
 
 #### Registry Upgrade Expectations
 
-When upgrading existing registries, the following manifests MUST be scanned for a `refers` field:
-
-1. Any existing `application/vnd.oci.image.manifest.v1+json` manifest referenced by a [digest tag](#digest-tags)
-2. Any newly uploaded `application/vnd.oci.image.manifest.v1+json` and `application/vnd.oci.artifact.manifest.v1+json` manifests
-
-Clients SHALL NOT expect manifests uploaded before the [referrers API](#referrers-api) is available on that registry, without using a [digest tag](#digest-tags), will be included in future API responses.
-
-#### Digest Tags
+##### Digest Tags
 
 For registries that do not support the `referrers` API, a tag MUST be pushed for any manifest containing a `refers` descriptor with the following syntax:
 
@@ -183,6 +176,15 @@ For registries that do not support the `referrers` API, a tag MUST be pushed for
 - Adding a `<hash>` of the artifact allows multiple artifacts of the same type to exist with little risk of collision or race conditions.
 - Periodic garbage collection may be performed by clients pushing new referrers, deleting stale referrers that have been replaced with newer versions, and tags that no longer point to an accessible manifest.
 - Clients can verify the registry does not support the `referrers` API by querying the API and checking for a 404.
+
+##### Manifest Migration
+
+When upgrading existing registries, the following manifests MUST be scanned for a `refers` field:
+
+1. Any existing `application/vnd.oci.image.manifest.v1+json` manifest referenced by a [digest tag](#digest-tags)
+2. Any newly uploaded `application/vnd.oci.image.manifest.v1+json` and `application/vnd.oci.artifact.manifest.v1+json` manifests
+
+Clients SHALL NOT expect manifests uploaded before the [referrers API](#referrers-api) is available on that registry, without using a [digest tag](#digest-tags), will be included in future API responses.
 
 ## Requirements
 
