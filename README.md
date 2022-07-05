@@ -24,19 +24,24 @@ Link to [governance](./GOVERNANCE.md) document.
 
 ### Proposals
 
-The following proposals are currently being evaluated by the WG:
+The following proposal ("E") is actively under revision and represents the
+current direction of the WG:
 
-| ID | Link                                   | Description                               |
-| -- | -------------------------------------- | ----------------------------------------- |
+| ID | Link                                   | Description  |
+| -- | -------------------------------------- | ------------ |
+| E  | [View](./docs/proposals/PROPOSAL_E.md) | Cherry pick  |
+
+### Inactive Proposals
+
+After much discussion, the following proposals are no longer being evaluated by the WG:
+
+| ID | Link                                   | Description                                                               |
+| -- | -------------------------------------- | ------------------------------------------------------------------------- |
 | A  | [View](./docs/proposals/PROPOSAL_A.md) | Defines a new artifact manifest and corresponding referrers extension API |
-| B  | [View](./docs/proposals/PROPOSAL_B.md) | Add "reference" field to existing schemas |
-| C  | [View](./docs/proposals/PROPOSAL_C.md) | Create Node manifest                      |
-| D  | [View](./docs/proposals/PROPOSAL_D.md) | No Changes                                |
-| E  | [View](./docs/proposals/PROPOSAL_E.md) | Cherry pick                               |
-| F  | [View](./docs/proposals/PROPOSAL_F.md) | OCI Index references it all               |
-
-*Want to add a new proposal? Submit a PR following the format of the
-[template](./docs/TEMPLATE.md).*
+| B  | [View](./docs/proposals/PROPOSAL_B.md) | Add "reference" field to existing schemas                                 |
+| C  | [View](./docs/proposals/PROPOSAL_C.md) | Create Node manifest                                                      |
+| D  | [View](./docs/proposals/PROPOSAL_D.md) | No Changes                                                                |
+| F  | [View](./docs/proposals/PROPOSAL_F.md) | OCI Index references it all                                               |
 
 ### Documents
 
