@@ -172,24 +172,22 @@ When upgrading existing registries, the following manifests MUST be scanned for 
 
 Clients SHALL NOT expect manifests uploaded before the [referrers API](#referrers-api) is available on that registry, without using a [digest tag](#digest-tags), will be included in future API responses.
 
-#### Digest Tags
+#### Digest Tag
 
-For registries that do not support the `referrers` API, a tag MUST be pushed for any manifest containing a `refers` descriptor with the following syntax:
+For registries that do not support the `referrers` API, a tag MUST be pushed containing an index of all manifests that refer to the specified manifest, matching the API response above.
+The tag uses the following schema:
 
 ```text
-<alg>-<ref>.<hash>.<type>
+<alg>-<ref>
 ```
 
-- E.g. `registry.example.org/project:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
+- E.g. `registry.example.org/project:sha256-0000000000000000000000000000000000000000000000000000000000000000`
 - `<alg>`: the digest algorithm
 - `<ref>`: the digest from the `refers` field (limit of 64 characters)
-- `<hash>`: the digest of this artifact (limit of 16 characters)
-- `<type>`: type of artifact for filtering (limit of 5 characters)
-  - The type field is based on a mapping from `artifactType` to a short string for the tag.
-- Querying for referrers requires the client to get the tag listing, and filter for matching `<alg>`, `<ref>`, and `<type>` entries.
-- Adding a `<hash>` of the artifact allows multiple artifacts of the same type to exist with little risk of collision or race conditions.
 - Periodic garbage collection may be performed by clients pushing new referrers, deleting stale referrers that have been replaced with newer versions, and tags that no longer point to an accessible manifest.
 - Clients can verify the registry does not support the `referrers` API by querying the API and checking for a 404.
+- Clients should pull the existing tag and extend it with additional entries, minimizing the time between the pull and push to reduce the chance of overwriting changes from other clients.
+- Clients should use a conditional push for registries that support ETag conditions to avoid overwriting a tag that has been modified by another client since the previous tag manifest was pulled.
 
 ## Requirements
 
@@ -198,15 +196,16 @@ For registries that do not support the `referrers` API, a tag MUST be pushed for
 1. As a user, I want to query a registry for a stored artifact by its digest or tag.
    - Yes, artifacts may be pushed and pulled by tag.
 1. As a user, I want to query the registry for all stored artifacts that reference a given artifact by its digest or tag.
-   - Yes, queries to the API work with a digest, and registries without the API can be queried by listing the tags and searching for the appropriate tag digest.
+   - Yes, queries to the API and digest tag work with a digest.
 1. As a user, I want to query a registry for all stored artifacts of a particular type that reference a given artifact by its digest or tag.
-   - Yes, digest tags include a type, and the API returns a descriptor list containing annotations that can be filtered by the client.
+   - Yes, the digest tag response and the API returns a descriptor list containing annotations that can be filtered by the client.
 1. As a user, I want to query a registry for all stored artifacts based on annotations that reference a given artifact by its digest or tag.
-   - Partial, registries that add the API returns a descriptor list containing annotations that can be filtered by the client.
+   - Partial, the returned index contains a descriptor list with annotations that can be filtered by the client.
 1. As a user, I want to fetch the most up-to-date artifact, collection of artifacts, or application.
-   - Partial, registries that add the API returns a descriptor list containing annotations that can be filtered by the client.
+   - Partial, the returned index contains a descriptor list with annotations that can be filtered by the client.
 1. As an artifact producer, I want to reduce the number of tags that reference an artifact.
-   - Yes, registries that add the API can associate artifacts with manifests without pushing digest tags.
+   - Yes, registries that add the API can associate artifacts with manifests without pushing a digest tag.
+     Existing registries only need a single digest tag per manifest with a referrer.
 
 ### Backwards Compatibility
 
@@ -214,14 +213,14 @@ For registries that do not support the `referrers` API, a tag MUST be pushed for
    - Yes, pulling existing images is not impacted by these changes.
 1. As a user, I want to move container images to and from registries that do not support reference types.
    - Yes, if Image manifests are used, artifacts can be pushed both to and from OCI compatible registries without changing the digest of the artifact.
-     Digest tags are used on registries without the new API.
+     A digest tag is used on registries without the new API.
 1. As an artifact producer, I want to tag artifacts that I can pull by said tag, even if they contain references to other artifacts.
    - Yes, artifacts may be pushed and pulled by tag.
 1. As an artifact producer, I want be sure that pushing an artifact to a repository will not affect a copy of the same artifact previously created and referenced by a manifest list existing in another repository on the same registry.
    - Yes, artifacts with referrers are pushed separately from the manifests they refer to.
 1. As a tool writer, I want to identify whether a registry supports reference types or not.
    - Yes, this can be provided by either the OCI extensions discovery interface, or querying the referrers API and checking for an error.
-     When a query to the referrers API fails, the client should push a digest tag.
+     When a query to the referrers API fails, the client should push the digest tag.
 1. As a tool writer, I would like the option to perform a server side blob mount when copying a large artifact between repositories.
    - Yes, blob APIs are not impacted by this proposal.
 1. As a tool writer, I want to be able to include reference types within the Image Layout filesystem format.
@@ -233,7 +232,7 @@ For registries that do not support the `referrers` API, a tag MUST be pushed for
    - Yes, referrers are created by the `refers` field and, for registries without the `referrers` API, a digest tag.
 1. As a user, when I delete an artifact, I want the option to delete one or more artifacts referencing it.
    - Yes, referrers could be queried first and explicitly deleted.
-     Digest tags can be explicitly deleted.
+     The digest tag can be explicitly deleted.
      Garbage collection should delete any untagged artifact if the `refers` field points to a non-existent manifest.
 1. As a user, I want to push an artifact that references another artifact that doesn't exist on the registry yet.
    - Partial, digest tags do not require the target manifest to exist on that registry, but would require clients to query for that tag even if the registry supports the `referrers` API.
@@ -245,12 +244,12 @@ For registries that do not support the `referrers` API, a tag MUST be pushed for
    - Yes, registry operators can configure their retention policies to support the `refers` field.
      Registries without the `referrers` API would continue to use tag based retention policies.
 1. As a registry operator, I want to allow users to "lock" the tags to their artifacts.
-   - Yes, registries that enforce tag locking can still have artifacts pushed that refer to that locked artifact.
-     Digest tags include a unique hash to allow multiple referrers to the same artifact with minimal risk of a hash collision.
+   - Partial, registries that enforce tag locking can still have artifacts pushed that refer to that locked artifact.
+     The digest tag can only be pushed once with a single index value.
 1. As an artifact producer, I want to update an existing artifact with a newer artifact.
    - Yes, artifacts may be pushed with unique creation annotations, and older artifacts can be explicitly deleted by the client.
 1. As an artifact producer, I want to push multiple artifacts concurrently (possibly from separate systems) without encountering race conditions or other errors.
-   - Yes, artifacts pushed either without a tag, or with a digest tag, are idempotent.
+   - No, registries without the `referrers` API will encounter race conditions updating the digest tag.
 1. As an artifact author, I want to document other artifacts in one or more registries that my artifact requires and/or provides.
    - Partial, cross repository or registry referrers are not supported with the `referrers` API.
      Digest tags may be used to point to digests that do not exist in the current repository.
