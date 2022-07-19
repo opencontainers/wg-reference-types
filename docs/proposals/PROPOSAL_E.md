@@ -176,11 +176,12 @@ For registries that do not support the `referrers` API, a tag MUST be pushed for
 
 - E.g. `registry.example.org/project:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
 - `<alg>`: the digest algorithm
-- `<ref>`: the digest from the `refers` field (limit of 64 characters)
-- `<hash>`: the digest of this artifact (limit of 16 characters)
+- `<ref>`: the digest of the referenced artifact from the `refers` field (limit of 64 characters)
+- `<hash>`: the digest of the referring artifact (limit of 16 characters)
 - `<type>`: type of artifact for filtering (limit of 5 characters)
+- The tag should point to this artifact (the artifact that contains the `refers` descriptor)
 - Querying for referrers requires the client to get the tag listing, and filter for matching `<alg>`, `<ref>`, and `<type>` entries.
-- Adding a `<hash>` of the artifact allows multiple artifacts of the same type to exist with little risk of collision or race conditions.
+- Adding a `<hash>` of the referring artifact allows multiple artifacts of the same type to exist with little risk of collision or race conditions.
 - Periodic garbage collection may be performed by clients pushing new referrers, deleting stale referrers that have been replaced with newer versions, and tags that no longer point to an accessible manifest.
 - Clients can verify the registry does not support the `referrers` API by querying the API and checking for a 404.
 
