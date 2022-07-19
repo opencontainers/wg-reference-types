@@ -57,7 +57,6 @@ Create a new artifact media type to support future use cases where a separate co
 
 ```jsonc
 {
-  "schemaVersion": 2,
   "mediaType": "application/vnd.oci.artifact.manifest.v1+json",
   "blobs": [
     // optional list, ordering is not enforced by the spec
