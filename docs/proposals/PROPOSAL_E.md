@@ -171,10 +171,10 @@ Clients SHALL NOT expect manifests uploaded before the [referrers API](#referrer
 For registries that do not support the `referrers` API, a tag MUST be pushed for any manifest containing a `refers` descriptor with the following syntax:
 
 ```text
-<alg>-<ref>.<hash>.<type>
+ref.<alg>-<ref>.<hash>.<type>
 ```
 
-- E.g. `registry.example.org/project:sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
+- E.g. `registry.example.org/project:ref.sha256-0000000000000000000000000000000000000000000000000000000000000000.0404040404040404.sbom`
 - `<alg>`: the digest algorithm
 - `<ref>`: the digest from the `refers` field (limit of 64 characters)
 - `<hash>`: the digest of this artifact (limit of 16 characters)
