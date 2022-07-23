@@ -36,7 +36,6 @@ The result is the following upgrade path:
 
 These annotations would be added for artifacts:
 
-- `org.opencontainers.artifact.type`: type of artifact (sig, sbom, etc)
 - `org.opencontainers.artifact.description`: human readable description for the artifact
 - `org.opencontainers.artifact.created`: creation time for a manifest
 
@@ -57,9 +56,8 @@ Create a new artifact media type to support future use cases where a separate co
 
 ```jsonc
 {
-  "schemaVersion": 2,
   "mediaType": "application/vnd.oci.artifact.manifest.v1+json",
-  "artifactType": "example/icecream", // used in place of config mediaType
+  "artifactType": "application/vnd.example.icecream.v1", // used in place of config mediaType
   "blobs": [
     // optional list, ordering is not enforced by the spec
     // but may be required for specific artifact types
@@ -82,7 +80,7 @@ Extend the Image Manifest with a refers field (existing registries should ignore
   "schemaVersion": 2,
   "mediaType": "application/vnd.oci.image.manifest.v1+json",
   "config": { 
-    "mediaType": "example/icecream",
+    "mediaType": "application/vnd.example.icecream.v1",
     "size": 1234,
     "digest" "sha256:cafecafecafe..."
   },
@@ -126,7 +124,7 @@ The response is an Index of descriptors:
   "manifests": [
     {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
-      "artifactType": "example/icecream", // pulled up from manifest
+      "artifactType": "application/vnd.example.icecream.v1", // pulled up from manifest
       "size": 1234,
       "digest": "sha256:a1a1a1...",
       "annotations": [
@@ -137,7 +135,7 @@ The response is an Index of descriptors:
     },
     {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
-      "artifactType": "example/icecream",
+      "artifactType": "application/vnd.example.icecream.v1",
       "size": 1234,
       "digest": "sha256:a2a2a2...",
       "annotations": [
