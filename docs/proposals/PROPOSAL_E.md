@@ -36,7 +36,6 @@ The result is the following upgrade path:
 
 These annotations would be added for artifacts:
 
-- `org.opencontainers.artifact.type`: type of artifact (sig, sbom, etc)
 - `org.opencontainers.artifact.description`: human readable description for the artifact
 - `org.opencontainers.artifact.created`: creation time for a manifest
 
@@ -57,8 +56,8 @@ Create a new artifact media type to support future use cases where a separate co
 
 ```jsonc
 {
-  "schemaVersion": 2,
   "mediaType": "application/vnd.oci.artifact.manifest.v1+json",
+  "artifactType": "application/vnd.example.icecream.v1", // used in place of config mediaType
   "blobs": [
     // optional list, ordering is not enforced by the spec
     // but may be required for specific artifact types
@@ -80,7 +79,11 @@ Extend the Image Manifest with a refers field (existing registries should ignore
 {
   "schemaVersion": 2,
   "mediaType": "application/vnd.oci.image.manifest.v1+json",
-  "config": { ... },
+  "config": { 
+    "mediaType": "application/vnd.example.icecream.v1",
+    "size": 1234,
+    "digest" "sha256:cafecafecafe..."
+  },
   "layers": [ ... ],
   "refers": { // new field
     "mediaType": "application/vnd.oci.image.manifest.v1+json", // any manifest media type
@@ -121,21 +124,21 @@ The response is an Index of descriptors:
   "manifests": [
     {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "artifactType": "application/vnd.example.icecream.v1", // pulled up from manifest
       "size": 1234,
       "digest": "sha256:a1a1a1...",
       "annotations": [
         // annotations pulled up from manifest
-        "org.opencontainers.artifact.type": "example/icecream",
         "org.opencontainers.artifact.created": "2022-01-01T14:42:55Z",
         "org.example.icecream.flavor": "chocolate"
       ]
     },
     {
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "artifactType": "application/vnd.example.icecream.v1",
       "size": 1234,
       "digest": "sha256:a2a2a2...",
       "annotations": [
-        "org.opencontainers.artifact.type": "example/icecream",
         "org.opencontainers.artifact.created": "2022-01-01T15:24:30Z",
         "org.example.icecream.flavor": "vanilla"
       ]
@@ -146,6 +149,9 @@ The response is an Index of descriptors:
   ]
 }
 ```
+
+The `annotation` and the `artifactType` fields are pulled up from the referrer manifests.
+The `artifactType` is pulled up from the `config` descriptor's `mediaType` field with image-spec manifests.
 
 If a registry does not implement the `referrers` API, it MUST return a 404.
 If a query results in no referrers found, an empty manifest list MUST be returned.
@@ -179,6 +185,7 @@ For registries that do not support the `referrers` API, a tag MUST be pushed for
 - `<ref>`: the digest from the `refers` field (limit of 64 characters)
 - `<hash>`: the digest of this artifact (limit of 16 characters)
 - `<type>`: type of artifact for filtering (limit of 5 characters)
+  - The type field is based on a mapping from `artifactType` to a short string for the tag.
 - Querying for referrers requires the client to get the tag listing, and filter for matching `<alg>`, `<ref>`, and `<type>` entries.
 - Adding a `<hash>` of the artifact allows multiple artifacts of the same type to exist with little risk of collision or race conditions.
 - Periodic garbage collection may be performed by clients pushing new referrers, deleting stale referrers that have been replaced with newer versions, and tags that no longer point to an accessible manifest.
