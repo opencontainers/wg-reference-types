@@ -159,9 +159,9 @@ If a query results in no referrers found, an empty manifest list MUST be returne
 ##### Ordering and Pagination
 
 - The registry MUST order the results in a way that allows pagination.
-- Adding the `n` query parameter is used to limit the number of entries per index returned.
-- The registry SHOULD return fewer than `n` results when the generated Index would exceed the recommended maximum manifest size.
 - The `Link` HTTP header is included in the response when additional results are available and is set to the URL for the next page of results.
+  Given the size of descriptors and maximum size of a manifest, paging is expected to be rare, and it is only supported in the API.
+- In the digest tag fallback, there is no paging support and there is no defined order of the manifests in the index.
 
 ##### Registry Upgrade Expectations
 
