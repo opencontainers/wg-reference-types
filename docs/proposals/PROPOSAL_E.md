@@ -34,7 +34,7 @@ The result is the following upgrade path:
 
 #### Annotations
 
-These annotations would be added for artifacts:
+These annotations would be added for artifacts (both the new artifact-spec and existing image-spec):
 
 - `org.opencontainers.artifact.description`: human readable description for the artifact
 - `org.opencontainers.artifact.created`: creation time for a manifest
@@ -73,7 +73,7 @@ Create a new artifact media type to support future use cases where a separate co
 
 #### Image Spec
 
-Extend the Image Manifest with a refers field (existing registries should ignore this per OCI's extensibility requirement):
+For supporting existing registries, the Image Manifest is extended with a refers field (existing registries should ignore this per OCI's extensibility requirement):
 
 ```jsonc
 {
@@ -97,7 +97,7 @@ Extend the Image Manifest with a refers field (existing registries should ignore
 }
 ```
 
-### Registry HTTP API
+### Distribution Spec
 
 #### Referrers API
 
@@ -156,14 +156,14 @@ The `artifactType` is pulled up from the `config` descriptor's `mediaType` field
 If a registry does not implement the `referrers` API, it MUST return a 404.
 If a query results in no referrers found, an empty manifest list MUST be returned.
 
-#### Ordering and Pagination
+##### Ordering and Pagination
 
 - The registry MUST order the results in a way that allows pagination.
 - Adding the `n` query parameter is used to limit the number of entries per index returned.
 - The registry SHOULD return fewer than `n` results when the generated Index would exceed the recommended maximum manifest size.
 - The `Link` HTTP header is included in the response when additional results are available and is set to the URL for the next page of results.
 
-#### Registry Upgrade Expectations
+##### Registry Upgrade Expectations
 
 When upgrading existing registries, the following manifests MUST be scanned for a `refers` field:
 
@@ -172,7 +172,12 @@ When upgrading existing registries, the following manifests MUST be scanned for 
 
 Clients SHALL NOT expect manifests uploaded before the [referrers API](#referrers-api) is available on that registry, without using a [digest tag](#digest-tags), will be included in future API responses.
 
-#### Digest Tag
+##### Garbage Collection
+
+For registries that implement garbage collection based on tagged manifests, an untagged manifest with a `refers` field pointing to an existing manifest should not be removed.
+When a manifest is deleted by a garbage collection policy or by an API request, all untagged artifacts that referred to that manifest may be cleaned by garbage collection.
+
+#### Digest Tags
 
 For registries that do not support the `referrers` API, a tag MUST be pushed containing an index of all manifests that refer to the specified manifest, matching the API response above.
 The tag uses the following schema:
@@ -188,6 +193,36 @@ The tag uses the following schema:
 - Clients can verify the registry does not support the `referrers` API by querying the API and checking for a 404.
 - Clients should pull the existing tag and extend it with additional entries, minimizing the time between the pull and push to reduce the chance of overwriting changes from other clients.
 - Clients should use a conditional push for registries that support ETag conditions to avoid overwriting a tag that has been modified by another client since the previous tag manifest was pulled.
+
+#### Client Expectations
+
+##### Creating Artifacts
+
+- For portability, clients should generate artifacts using image-spec until all registries where the artifact is pushed to have been upgraded.
+- The descriptor of the manifest this artifact refers to should be set in the `refers` field of the manifest.
+- Other metadata should be included in the manifest annotations.
+- When pushing, the registry should be checked for the referrers API support.
+- If the referrers API is not available, the artifact should be pushed with a tag using the digest schema. Tags with the digest schema should not be pushed if the referrers API is available.
+
+##### Pulling Artifacts
+
+To pull artifacts that reference an existing manifest:
+
+- Clients requests artifacts associated with a manifest first query the referrers API using the digest of the requested manifest.
+- If the request fails, clients must fall back to listing tags in the repository and pull manifests for each tag with the matching `<alg>` and `<ref>` prefix.
+- Clients then pull any artifact matching their criteria from the API response or the list generated from the tag query.
+
+##### Copying Images
+
+- Tooling that copies images between registries may recursively query for referrers and copy them.
+- Copying an artifact that refers to an image uses the same pull and push steps described above and should support both existing registries and registries with the `referrers` API on both the pull and push.
+
+##### Deleting Manifests
+
+For managing existing registries without the `referrers` API:
+
+- Client tooling that deletes manifests should also delete digest tags that reference that manifest.
+- Client tooling may periodically check for dangling digest tags that refer to missing manifest, and prune those tags.
 
 ## Requirements
 
