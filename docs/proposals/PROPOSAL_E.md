@@ -168,6 +168,7 @@ A limited ability to filter results based on `artifactType` will enable the refe
  - The registry SHOULD allow for filtering based on `artifactType`.
  - Clients MAY request results be filtered by adding the `artifactType` query parameter to requests to the referrers API.
  - The value for `artifactType` MUST be the IANA media type of the artifact to be returned.
+ - Clients SHOULD send only one `artifactType` query parameter, and registries SHOULD only interpret one when filtering, if a client sends multiple values.
 
 Example request with filtering:
  ```text
