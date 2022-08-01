@@ -166,7 +166,7 @@ If a query results in no referrers found, an empty manifest list MUST be returne
 ##### Filtering
 A limited ability to filter results based on `artifactType` will enable the referrers API to scale as the number of artifact use cases grows.
  - The registry SHOULD allow for filtering based on `artifactType`.
- - Clients MAY request results be filterd by adding the `artifactType` query parameter to requests to the referrers API.
+ - Clients MAY request results be filtered by adding the `artifactType` query parameter to requests to the referrers API.
  - The value for `artifactType` MUST be the IANA media type of the artifact to be returned.
 
 Example request with filtering:
