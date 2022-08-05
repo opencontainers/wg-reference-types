@@ -10,7 +10,7 @@ It consists of the following changes:
 
 - It adds a new media type for future use cases.
 - It defines a "refers" field on both the new media type and existing image manifests.
-- It defines annotations for filtering artifacts.
+- It defines an artifactType field to enable users to differentiate between types of artifacts and filter referrer results based on type.
 - It defines both an API and a digest tag syntax for querying referrers.
 
 The result is the following upgrade path:
@@ -65,9 +65,9 @@ Create a new artifact media type to support future use cases where a separate co
   "refers": { // optional
     // include refers here
   },
-  "annotations": [ // optional
+  "annotations": { // optional
     // annotations for this artifact here
-  ]
+  }
 }
 ```
 
@@ -80,7 +80,7 @@ For supporting existing registries, the Image Manifest is extended with a refers
   "schemaVersion": 2,
   "mediaType": "application/vnd.oci.image.manifest.v1+json",
   "config": { 
-    "mediaType": "application/vnd.example.icecream.v1",
+    "mediaType": "application/vnd.example.icecream.v1", // already used as "artifact type" today by many implementations
     "size": 1234,
     "digest" "sha256:cafecafecafe..."
   },
@@ -91,9 +91,9 @@ For supporting existing registries, the Image Manifest is extended with a refers
     "digest": "sha256:a1a1a1...",
     "annotations": []
   },
-  "annotations": [
+  "annotations": {
     // annotations for this artifact here
-  ]
+  }
 }
 ```
 
@@ -144,9 +144,9 @@ The response is an Index of descriptors:
       ]
     }
   ],
-  "annotations": [
+  "annotations": {
     // reserved for future use
-  ]
+  }
 }
 ```
 
@@ -162,6 +162,53 @@ If a query results in no referrers found, an empty manifest list MUST be returne
 - The `Link` HTTP header is included in the response when additional results are available and is set to the URL for the next page of results.
   Given the size of descriptors and maximum size of a manifest, paging is expected to be rare, and it is only supported in the API.
 - In the digest tag fallback, there is no paging support and there is no defined order of the manifests in the index.
+
+##### Filtering
+A limited ability to filter results based on `artifactType` will enable the referrers API to scale as the number of artifact use cases grows.
+ - The registry SHOULD allow for filtering based on `artifactType`.
+ - If the registry performs filtering, the response MUST include an annotation (`org.opencontainers.references.filtersApplied`) denoting that an `artifactType` filter was applied.
+ - Clients MAY request results be filtered by adding the `artifactType` query parameter to requests to the referrers API.
+ - The value for `artifactType` MUST be the IANA media type of the artifact to be returned.
+ - Clients SHOULD send only one `artifactType` query parameter, and registries SHOULD only interpret one when filtering, if a client sends multiple values.
+
+Example request with filtering:
+ ```text
+GET /v2/<name>/referrers/<ref>?artifactType=application/vnd.example.icecream.v1
+```
+
+Response:
+```jsonc
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "manifests": [
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "artifactType": "application/vnd.example.icecream.v1", // pulled up from manifest
+      "size": 1234,
+      "digest": "sha256:a1a1a1...",
+      "annotations": [
+        // annotations pulled up from manifest
+        "org.opencontainers.artifact.created": "2022-01-01T14:42:55Z",
+        "org.example.icecream.flavor": "chocolate"
+      ]
+    },
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "artifactType": "application/vnd.example.icecream.v1",
+      "size": 1234,
+      "digest": "sha256:a2a2a2...",
+      "annotations": [
+        "org.opencontainers.artifact.created": "2022-01-01T15:24:30Z",
+        "org.example.icecream.flavor": "vanilla"
+      ]
+    }
+  ],
+  "annotations": {
+    "org.opencontainers.references.filtersApplied": "artifactType"
+  }
+}
+```
 
 ##### Registry Upgrade Expectations
 
@@ -234,6 +281,7 @@ For managing existing registries without the `referrers` API:
    - Yes, queries to the API and digest tag work with a digest.
 1. As a user, I want to query a registry for all stored artifacts of a particular type that reference a given artifact by its digest or tag.
    - Yes, the digest tag response and the API returns a descriptor list containing annotations that can be filtered by the client.
+In addition, the API supports filtering by `artifactType`.
 1. As a user, I want to query a registry for all stored artifacts based on annotations that reference a given artifact by its digest or tag.
    - Partial, the returned index contains a descriptor list with annotations that can be filtered by the client.
 1. As a user, I want to fetch the most up-to-date artifact, collection of artifacts, or application.
