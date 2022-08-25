@@ -1,5 +1,9 @@
 # OCI Working Group: Reference Types
 
+## Status
+
+This WG has met the mission statement below and has now been archived.
+
 ## Mission Statement
 
 Propose how to describe and query relationships between objects stored in an OCI registry.
@@ -20,25 +24,19 @@ Link to [governance](./GOVERNANCE.md) document.
 * [Past Meetings](https://github.com/opencontainers/wg-reference-types/tree/main/minutes).
 * [Initial Google Doc](https://docs.google.com/document/d/1SVOWQTowigXzbYdorzfa7tMmrcm91yK12LvSONqziJY/edit)
 
-## In Progress
+## Completed
 
 ### Upstream Changes
 
-The following changesets are being prepared to be submitted upstream based on
+The following PRs were merged upstream based on
 [Proposal E](./docs/proposals/PROPOSAL_E.md).
 
-These forks are currently found in the [oci-playground](https://github.com/oci-playground)
-GitHub org (an extension of this working group).
-
-| Upstream repo                                                                            | Changeset                                                                                                      |
-| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [opencontainers/distribution-spec](https://github.com/opencontainers/distribution-spec)  | [View](https://github.com/opencontainers/distribution-spec/compare/main...oci-playground:distribution-spec:pr) |
-| [opencontainers/image-spec](https://github.com/opencontainers/image-spec)                | [View](https://github.com/opencontainers/image-spec/compare/main...oci-playground:image-spec:pr)               |
+   * https://github.com/opencontainers/distribution-spec/pull/335
+   * https://github.com/opencontainers/image-spec/pull/934
 
 ### Proposals
 
-The following proposal ("E") is actively under revision and represents the
-current direction of the WG:
+The following proposal ("E") is now frozen and has been proposed and merged upstream:
 
 | ID | Link                                   | Description  |
 | -- | -------------------------------------- | ------------ |
